@@ -634,7 +634,7 @@ export default function App() {
 
       {/* Navigation */}
       <nav className="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-8 py-6 md:px-12 bg-gradient-to-b from-[#0a0a0a] to-transparent">
-        <div className="text-xl font-black tracking-tighter">OSAMI.IO</div>
+        <div className="text-xl font-black tracking-tighter">GABRIELDEV</div>
         <div className="hidden md:flex gap-8">
           {navItems.map((item) => (
             <a
@@ -657,18 +657,18 @@ export default function App() {
         <GlowingOrbs />
         <div className="max-w-7xl w-full mx-auto relative z-10">
           <div className="relative mb-12">
-            <h1 className="hero-text text-[12vw] md:text-[10vw] font-black leading-[0.85] tracking-tighter uppercase">
-              Creative
+            <h1 className="hero-text text-[11vw] md:text-[9vw] font-black leading-[0.85] tracking-tighter uppercase">
+              Web Developer
             </h1>
             <div className="flex items-start gap-4 md:gap-8">
               <div className="hero-line w-[1px] bg-gray-700 self-stretch mt-4" />
-              <h1 className="hero-text text-[12vw] md:text-[10vw] font-black leading-[0.85] tracking-tighter uppercase text-[#E8175D]">
-                Developer
+              <h1 className="hero-text text-[11vw] md:text-[9vw] font-black leading-[0.85] tracking-tighter uppercase text-[#E8175D]">
+                FullStack
               </h1>
             </div>
             <div className="absolute right-0 bottom-0 text-right">
               <p className="hero-text font-mono text-[10px] tracking-widest text-gray-400">
-                Chris Allow / Web Developer
+                Gabriel / Web Developer FullStack
               </p>
             </div>
           </div>
@@ -897,8 +897,8 @@ export default function App() {
                 Let's build something <span className="text-[#E8175D]">extraordinary</span> together.
               </p>
               <div className="flex flex-col gap-4">
-                <a href="mailto:hello@osami.io" className="font-mono text-xl md:text-2xl hover:text-[#E8175D] transition-colors underline underline-offset-8 decoration-gray-800 hover:decoration-[#E8175D]">
-                  hello@osami.io
+                <a href="mailto:gabriel938@gmail.com" className="font-mono text-xl md:text-2xl hover:text-[#E8175D] transition-colors underline underline-offset-8 decoration-gray-800 hover:decoration-[#E8175D]">
+                  gabriel938@gmail.com
                 </a>
                 <p className="font-mono text-xs text-gray-500 uppercase tracking-widest">
                   Available for freelance & collaborations
@@ -917,7 +917,7 @@ export default function App() {
       <footer className="relative z-10 py-12 border-t border-gray-900 px-8 md:px-12">
         <div className="max-w-7xl w-full mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
           <div className="font-mono text-[10px] text-gray-600 uppercase tracking-widest">
-            © 2024 OSAMI.IO / ALL RIGHTS RESERVED
+            © 2024 GABRIELDEV / ALL RIGHTS RESERVED
           </div>
           <div className="flex gap-8 font-mono text-[10px] text-gray-600 uppercase tracking-widest">
             <a href="#" className="hover:text-[#E8175D] transition-colors">Privacy Policy</a>
