@@ -8,6 +8,8 @@ import { Github, Linkedin, Mail, Twitter, ArrowUpRight } from "lucide-react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import Lenis from "lenis";
+import SplitType from "split-type";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -18,7 +20,7 @@ const ParticleWave = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext("2d", { alpha: false }); // Optimization: Disable alpha for faster compositing if background is solid, but here we need it. Let's keep it default but optimize drawing.
     if (!ctx) return;
 
     let animationFrameId: number;
@@ -41,45 +43,54 @@ const ParticleWave = () => {
 
     const render = () => {
       if (!isVisible) return;
-      time += 0.002; // Slightly slower for a calmer feel
+      time += 0.0015; // Slower time step
+      
+      // Optimization: Use a semi-transparent fill instead of clearRect for a trailing effect, 
+      // but clearRect is generally faster. We'll stick to clearRect but optimize the loop.
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
+      ctx.fillStyle = "rgba(255, 255, 255, 0.3)"; // Slightly more transparent
 
-      // Position the mesh further to the right
       const cx = canvas.width * 0.85;
       const cy = canvas.height * 0.5;
 
-      // Optimization: Reduce number of rings and increase spacing
-      const numRings = 40; // Was 80
-      const ringSpacing = 14; // Was 8
-      const dotSpacing = 10; // Was 6
+      // Aggressive Optimization: Further reduce rings and increase spacing
+      const numRings = 30; // Reduced from 40
+      const ringSpacing = 18; // Increased from 14
+      const dotSpacing = 14; // Increased from 10
+
+      // Pre-calculate some values outside the inner loop
+      const tilt = Math.PI / 3.5;
+      const cosTilt = Math.cos(tilt);
+      const sinTilt = Math.sin(tilt);
+
+      ctx.beginPath(); // Optimization: Batch drawing operations
 
       for (let i = 0; i < numRings; i++) {
         const radius = i * ringSpacing;
-        const numDots = Math.max(10, Math.floor((Math.PI * 2 * radius) / dotSpacing));
+        const numDots = Math.max(8, Math.floor((Math.PI * 2 * radius) / dotSpacing));
         
         for (let j = 0; j < numDots; j++) {
           const angle = (j / numDots) * Math.PI * 2;
           
-          // Complex wavy surface math
-          const z = Math.sin(angle * 3 + time) * 50 + Math.cos(i * 0.1 - time) * 50;
+          // Simplified math
+          const z = Math.sin(angle * 2 + time) * 40 + Math.cos(i * 0.1 - time) * 40;
           const scale = 800 / (800 + z);
           
-          // Tilt the surface
-          const tilt = Math.PI / 3.5;
-          const yRotated = Math.sin(angle) * radius * Math.cos(tilt) - z * Math.sin(tilt);
+          const yRotated = Math.sin(angle) * radius * cosTilt - z * sinTilt;
           
           const px = cx + Math.cos(angle) * radius * scale;
           const py = cy + yRotated * scale;
 
-          // Optimization: Only draw if it's on the right half (from 45% to the right edge)
-          // and use fillRect instead of arc for massive performance gain
-          if (px > canvas.width * 0.45 && px < canvas.width && py > 0 && py < canvas.height) {
-            const size = 1.5 * scale;
-            ctx.fillRect(px, py, size, size);
+          // Optimization: Stricter culling
+          if (px > canvas.width * 0.5 && px < canvas.width && py > 0 && py < canvas.height) {
+            const size = 1.2 * scale;
+            // Instead of fillRect in the loop, we use rect to batch them
+            ctx.rect(px, py, size, size);
           }
         }
       }
+      
+      ctx.fill(); // Draw all rects at once
 
       animationFrameId = requestAnimationFrame(render);
     };
@@ -117,11 +128,11 @@ const ParticleWave = () => {
 
 const GlowingOrbs = () => (
   <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-    <div className="absolute top-[-10%] left-[-10%] w-[40vw] h-[40vw] rounded-full bg-[#E8175D]/5 blur-[120px] will-change-transform" />
-    <div className="absolute bottom-[-10%] right-[-10%] w-[30vw] h-[30vw] rounded-full bg-[#E8175D]/5 blur-[100px] will-change-transform" />
-    <div className="absolute top-[20%] right-[15%] w-[30vw] h-[30vw] border border-[#E8175D]/20 rounded-full animate-[spin_20s_linear_infinite] opacity-30 will-change-transform" />
-    <div className="absolute top-[20%] right-[15%] w-[30vw] h-[30vw] border border-[#E8175D]/10 rounded-full animate-[spin_15s_linear_infinite_reverse] opacity-30 scale-110 will-change-transform" />
-    <div className="absolute top-[20%] right-[15%] w-[30vw] h-[30vw] border border-[#E8175D]/5 rounded-full animate-[spin_25s_linear_infinite] opacity-30 scale-90 will-change-transform" />
+    <div className="absolute top-[-10%] left-[-10%] w-[40vw] h-[40vw] rounded-full bg-[#E8175D]/5 blur-[120px]" />
+    <div className="absolute bottom-[-10%] right-[-10%] w-[30vw] h-[30vw] rounded-full bg-[#E8175D]/5 blur-[100px]" />
+    <div className="absolute top-[20%] right-[15%] w-[30vw] h-[30vw] border border-[#E8175D]/20 rounded-full animate-[spin_20s_linear_infinite] opacity-30" />
+    <div className="absolute top-[20%] right-[15%] w-[30vw] h-[30vw] border border-[#E8175D]/10 rounded-full animate-[spin_15s_linear_infinite_reverse] opacity-30 scale-110" />
+    <div className="absolute top-[20%] right-[15%] w-[30vw] h-[30vw] border border-[#E8175D]/5 rounded-full animate-[spin_25s_linear_infinite] opacity-30 scale-90" />
   </div>
 );
 
@@ -139,13 +150,37 @@ const SocialBar = () => {
   );
 };
 
-const SectionHeader = ({ number, title }: { number: string; title: string }) => (
-  <div className="section-header flex items-center gap-4 mb-12">
-    <span className="font-mono text-xs text-gray-600">{number}</span>
-    <div className="h-[1px] flex-1 bg-gray-800" />
-    <h2 className="font-display text-4xl md:text-6xl uppercase tracking-tighter">{title}</h2>
-  </div>
-);
+const SectionHeader = ({ number, title }: { number: string; title: string }) => {
+  const headerRef = useRef<HTMLHeadingElement>(null);
+
+  useGSAP(() => {
+    if (!headerRef.current) return;
+    const text = new SplitType(headerRef.current, { types: 'chars' });
+    
+    gsap.from(text.chars, {
+      scrollTrigger: {
+        trigger: headerRef.current,
+        start: "top 85%",
+      },
+      y: 50,
+      opacity: 0,
+      rotateX: -90,
+      stagger: 0.02,
+      duration: 0.8,
+      ease: "power4.out"
+    });
+  }, { scope: headerRef });
+
+  return (
+    <div className="section-header flex items-center gap-4 mb-12">
+      <span className="font-mono text-xs text-gray-600">{number}</span>
+      <div className="h-[1px] flex-1 bg-gray-800" />
+      <h2 ref={headerRef} className="font-display text-4xl md:text-6xl uppercase tracking-tighter overflow-hidden">
+        {title}
+      </h2>
+    </div>
+  );
+};
 
 const ContactForm = () => {
   const [submitted, setSubmitted] = useState(false);
@@ -188,60 +223,68 @@ const ContactForm = () => {
 
 const CustomCursor = () => {
   const cursorRef = useRef<HTMLDivElement>(null);
-  const dotRef = useRef<HTMLDivElement>(null);
   const [isHovering, setIsHovering] = useState(false);
 
   useEffect(() => {
     const cursor = cursorRef.current;
-    const dot = dotRef.current;
-    if (!cursor || !dot) return;
+    if (!cursor) return;
+
+    // Optimization: Use GSAP quickTo for highly performant mouse tracking
+    const xTo = gsap.quickTo(cursor, "x", { duration: 0.1, ease: "power2.out" });
+    const yTo = gsap.quickTo(cursor, "y", { duration: 0.1, ease: "power2.out" });
 
     const onMouseMove = (e: MouseEvent) => {
-      gsap.to(cursor, {
-        x: e.clientX,
-        y: e.clientY,
-        duration: 0.5,
-        ease: "power3.out"
-      });
-      gsap.to(dot, {
-        x: e.clientX,
-        y: e.clientY,
-        duration: 0.1,
-        ease: "power2.out"
-      });
+      xTo(e.clientX);
+      yTo(e.clientY);
     };
 
-    const onMouseEnter = () => setIsHovering(true);
-    const onMouseLeave = () => setIsHovering(false);
+    // Optimization: Use event delegation instead of attaching listeners to many elements
+    // and definitely avoid MutationObserver which is too heavy.
+    const onMouseOver = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.closest('a, button, input, textarea, .group, .tech-card, .project-item')) {
+        setIsHovering(true);
+      }
+    };
+
+    const onMouseOut = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.closest('a, button, input, textarea, .group, .tech-card, .project-item')) {
+        setIsHovering(false);
+      }
+    };
 
     window.addEventListener("mousemove", onMouseMove);
-    
-    const interactiveElements = document.querySelectorAll('a, button, input, textarea, .group');
-    interactiveElements.forEach(el => {
-      el.addEventListener("mouseenter", onMouseEnter);
-      el.addEventListener("mouseleave", onMouseLeave);
-    });
+    document.body.addEventListener("mouseover", onMouseOver);
+    document.body.addEventListener("mouseout", onMouseOut);
 
     return () => {
       window.removeEventListener("mousemove", onMouseMove);
-      interactiveElements.forEach(el => {
-        el.removeEventListener("mouseenter", onMouseEnter);
-        el.removeEventListener("mouseleave", onMouseLeave);
-      });
+      document.body.removeEventListener("mouseover", onMouseOver);
+      document.body.removeEventListener("mouseout", onMouseOut);
     };
   }, []);
 
   return (
-    <>
-      <div
-        ref={cursorRef}
-        className={`fixed top-0 left-0 w-10 h-10 border border-[#E8175D] rounded-full pointer-events-none z-[9999] -translate-x-1/2 -translate-y-1/2 transition-transform duration-300 mix-blend-difference ${isHovering ? 'scale-150 bg-[#E8175D]/10' : 'scale-100'}`}
-      />
-      <div
-        ref={dotRef}
-        className="fixed top-0 left-0 w-1 h-1 bg-[#E8175D] rounded-full pointer-events-none z-[9999] -translate-x-1/2 -translate-y-1/2"
-      />
-    </>
+    <div
+      ref={cursorRef}
+      className="fixed top-0 left-0 pointer-events-none z-[9999] -translate-x-1/2 -translate-y-1/2 mix-blend-difference"
+    >
+      <div className={`relative transition-all duration-500 ${isHovering ? 'scale-150' : 'scale-100'}`}>
+        {/* Crosshair Brackets */}
+        <div className={`absolute -top-5 -left-5 w-3 h-3 border-t-2 border-l-2 border-[#E8175D] transition-all duration-500 ${isHovering ? 'translate-x-[-4px] translate-y-[-4px]' : ''}`} />
+        <div className={`absolute -top-5 -right-5 w-3 h-3 border-t-2 border-r-2 border-[#E8175D] transition-all duration-500 ${isHovering ? 'translate-x-[4px] translate-y-[-4px]' : ''}`} />
+        <div className={`absolute -bottom-5 -left-5 w-3 h-3 border-b-2 border-l-2 border-[#E8175D] transition-all duration-500 ${isHovering ? 'translate-x-[-4px] translate-y-[4px]' : ''}`} />
+        <div className={`absolute -bottom-5 -right-5 w-3 h-3 border-b-2 border-r-2 border-[#E8175D] transition-all duration-500 ${isHovering ? 'translate-x-[4px] translate-y-[4px]' : ''}`} />
+        
+        {/* Crosshair Lines */}
+        <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-[1px] bg-[#E8175D] transition-all duration-300 ${isHovering ? 'w-12 opacity-100' : 'w-4 opacity-50'}`} />
+        <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-8 w-[1px] bg-[#E8175D] transition-all duration-300 ${isHovering ? 'h-12 opacity-100' : 'h-4 opacity-50'}`} />
+        
+        {/* Center Point */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-white rounded-full shadow-[0_0_10px_#E8175D]" />
+      </div>
+    </div>
   );
 };
 
@@ -296,20 +339,45 @@ const ExperienceCard = ({ exp, status, pos }: { exp: any, status: string, pos: s
 export default function App() {
   const container = useRef<HTMLDivElement>(null);
   const experienceRef = useRef<HTMLDivElement>(null);
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-
-  const handleExperienceMouseMove = (e: React.MouseEvent) => {
-    if (!experienceRef.current) return;
-    const rect = experienceRef.current.getBoundingClientRect();
-    setMousePos({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top
-    });
-  };
+  const techSectionRef = useRef<HTMLDivElement>(null);
+  const techContainerRef = useRef<HTMLDivElement>(null);
 
   const [activeSection, setActiveSection] = useState("home");
 
   useGSAP(() => {
+    // Initialize Lenis
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+    });
+
+    // Sync ScrollTrigger with Lenis
+    lenis.on('scroll', ScrollTrigger.update);
+
+    // Use GSAP's ticker for Lenis to ensure they are perfectly synced
+    gsap.ticker.add((time) => {
+      lenis.raf(time * 1000);
+    });
+
+    gsap.ticker.lagSmoothing(0);
+
+    // Experience Section Lighting Effect Optimization
+    const expLight = document.querySelector('.experience-light') as HTMLElement;
+    let updateLight: (e: MouseEvent) => void;
+    
+    if (expLight && experienceRef.current) {
+      updateLight = (e: MouseEvent) => {
+        const rect = experienceRef.current!.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        // Only update if mouse is over the section
+        if (x >= 0 && x <= rect.width && y >= 0 && y <= rect.height) {
+          expLight.style.background = `radial-gradient(circle 300px at ${x}px ${y}px, rgba(232, 23, 93, 0.15), transparent 80%)`;
+        }
+      };
+      window.addEventListener('mousemove', updateLight);
+    }
+
     // Hero Animations
     gsap.from(".hero-text", {
       y: 50,
@@ -336,6 +404,105 @@ export default function App() {
       ease: "power2.out"
     });
 
+    // 3D Tunnel Scroll for Technologies
+    if (techSectionRef.current && techContainerRef.current) {
+      const cards = gsap.utils.toArray<HTMLElement>('.tech-card');
+      const zGap = 1000; // Reduced gap for tighter scroll
+      const totalZ = cards.length * zGap;
+
+      // Pre-create quickSetters for maximum performance
+      const setters = cards.map(card => ({
+        z: gsap.quickSetter(card, "z", "px"),
+        opacity: gsap.quickSetter(card, "opacity"),
+        scale: gsap.quickSetter(card, "scale"),
+        display: gsap.quickSetter(card, "display"),
+        pointerEvents: gsap.quickSetter(card, "pointerEvents")
+      }));
+
+      // Set initial positions
+      cards.forEach((card, i) => {
+        setters[i].z(-i * zGap);
+        setters[i].opacity(0);
+        setters[i].scale(0.5);
+        setters[i].display('none');
+      });
+
+      ScrollTrigger.create({
+        trigger: techSectionRef.current,
+        start: "top top",
+        end: `+=${cards.length * 80}%`, // Slightly shorter scroll distance
+        pin: true,
+        scrub: 0.5, // Reduced scrub for snappier feel
+        onUpdate: (self) => {
+          const progress = self.progress;
+          const currentZ = progress * totalZ;
+          
+          cards.forEach((card, i) => {
+            const itemZ = -i * zGap + currentZ;
+            
+            // Optimization: Only process cards within a visible range
+            if (itemZ > -2000 && itemZ < 1000) {
+              let opacity = 0;
+              let scale = 0.5;
+              
+              if (itemZ <= 0) {
+                // Approaching
+                const ratio = Math.max(0, 1 - (Math.abs(itemZ) / 1500));
+                opacity = ratio;
+                scale = 0.5 + (ratio * 0.5); // Scale from 0.5 to 1
+              } else {
+                // Passing
+                const ratio = Math.max(0, 1 - (itemZ / 800));
+                opacity = ratio;
+                scale = 1 + ((1 - ratio) * 0.5); // Scale from 1 to 1.5
+              }
+
+              setters[i].z(itemZ);
+              setters[i].opacity(opacity);
+              setters[i].scale(scale);
+              
+              if (card.style.display !== 'flex') setters[i].display('flex');
+              
+              const isInteractive = itemZ > -100 && itemZ < 100;
+              if (card.style.pointerEvents !== (isInteractive ? 'auto' : 'none')) {
+                  setters[i].pointerEvents(isInteractive ? 'auto' : 'none');
+              }
+
+            } else {
+              // Hide cards out of range to save rendering
+              if (card.style.display !== 'none') {
+                setters[i].display('none');
+              }
+            }
+          });
+
+          // Update HUD readouts (throttled implicitly by RAF)
+          const velReadout = document.getElementById('vel-readout');
+          if (velReadout) velReadout.innerText = (self.getVelocity() / 100).toFixed(2);
+        }
+      });
+
+      // Background text parallax optimization
+      const bgText = document.querySelector('.tech-bg-text') as HTMLElement;
+      if (bgText) {
+        const ySetter = gsap.quickSetter(bgText, "y", "px");
+        const scaleSetter = gsap.quickSetter(bgText, "scale");
+        const opacitySetter = gsap.quickSetter(bgText, "opacity");
+
+        ScrollTrigger.create({
+          trigger: techSectionRef.current,
+          start: "top bottom",
+          end: "bottom top",
+          onUpdate: (self) => {
+            const p = self.progress;
+            ySetter(-100 * p);
+            scaleSetter(1 + (0.2 * p));
+            opacitySetter(0.05 * (1 - p));
+          }
+        });
+      }
+    }
+
     // Scroll Animations
     gsap.utils.toArray('.section-header').forEach((header: any) => {
       gsap.from(header, {
@@ -350,42 +517,34 @@ export default function App() {
       });
     });
 
-    gsap.utils.toArray('.project-item').forEach((item: any, i) => {
-      gsap.from(item, {
-        scrollTrigger: {
-          trigger: item,
-          start: "top 90%",
-        },
-        y: 30,
-        opacity: 0,
-        duration: 0.6,
-        ease: "power2.out"
-      });
-    });
-
-    gsap.from('.experience-card-wrapper', {
-      scrollTrigger: {
-        trigger: '#experience',
-        start: "top 70%",
+    // Optimization: Use batch for project items to reduce ScrollTrigger overhead
+    ScrollTrigger.batch('.project-item', {
+      start: "top 90%",
+      onEnter: (elements) => {
+        gsap.from(elements, {
+          y: 30,
+          opacity: 0,
+          duration: 0.6,
+          stagger: 0.1,
+          ease: "power2.out"
+        });
       },
-      y: 50,
-      opacity: 0,
-      duration: 0.8,
-      stagger: 0.2,
-      ease: "power3.out"
+      once: true // Only animate once
     });
 
-    gsap.utils.toArray('.skill-item').forEach((item: any, i) => {
-      gsap.from(item, {
-        scrollTrigger: {
-          trigger: item,
-          start: "top 90%",
-        },
-        scale: 0.9,
-        opacity: 0,
-        duration: 0.4,
-        ease: "back.out(1.5)"
-      });
+    // Optimization: Use batch for experience cards
+    ScrollTrigger.batch('.experience-card-wrapper', {
+      start: "top 80%",
+      onEnter: (elements) => {
+        gsap.from(elements, {
+          y: 50,
+          opacity: 0,
+          duration: 0.8,
+          stagger: 0.2,
+          ease: "power3.out"
+        });
+      },
+      once: true
     });
 
     // Scrollspy
@@ -400,13 +559,19 @@ export default function App() {
       });
     });
 
+    return () => {
+      lenis.destroy();
+      if (updateLight) {
+        window.removeEventListener('mousemove', updateLight);
+      }
+    };
   }, { scope: container });
 
   const navItems = [
     { id: "01", label: "HOME", href: "#home" },
     { id: "02", label: "PROJECTS", href: "#projects" },
     { id: "03", label: "EXPERIENCE", href: "#experience" },
-    { id: "04", label: "SKILLS", href: "#skills" },
+    { id: "04", label: "TECHNOLOGIES", href: "#skills" },
     { id: "05", label: "CONTACT", href: "#contact" },
   ];
 
@@ -581,7 +746,6 @@ export default function App() {
       <section 
         id="experience" 
         ref={experienceRef}
-        onMouseMove={handleExperienceMouseMove}
         className="relative z-10 py-32 px-8 md:px-12 bg-[#050505] overflow-hidden"
       >
         {/* Background Grid */}
@@ -589,9 +753,9 @@ export default function App() {
         
         {/* Grid Lighting Effect */}
         <div 
-          className="absolute inset-0 pointer-events-none opacity-40 transition-opacity duration-300"
+          className="experience-light absolute inset-0 pointer-events-none opacity-40 transition-opacity duration-300"
           style={{
-            background: `radial-gradient(circle 300px at ${mousePos.x}px ${mousePos.y}px, rgba(232, 23, 93, 0.15), transparent 80%)`
+            background: `radial-gradient(circle 300px at 0px 0px, rgba(232, 23, 93, 0.15), transparent 80%)`
           }}
         />
         
@@ -635,23 +799,89 @@ export default function App() {
         </div>
       </section>
 
-      {/* Skills Section */}
-      <section id="skills" className="relative z-10 py-32 px-8 md:px-12 bg-white/5">
-        <div className="max-w-7xl w-full mx-auto">
+      {/* Technologies Section */}
+      <section 
+        id="skills" 
+        ref={techSectionRef}
+        className="relative z-10 bg-[#030303] overflow-hidden min-h-screen flex flex-col justify-center"
+        style={{ perspective: '1000px' }}
+      >
+        <div className="absolute top-20 left-8 md:left-12 z-20 w-full max-w-7xl mx-auto">
           <SectionHeader number="04" title="TECHNOLOGIES" />
-          
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-gray-800 border border-gray-800">
-            {skills.map((skill, index) => (
-              <div
-                key={index}
-                className="skill-item bg-[#0a0a0a] p-12 flex flex-col items-center justify-center group hover:bg-[#E8175D] transition-colors duration-500"
-              >
-                <span className="font-mono text-[10px] text-gray-600 mb-4 group-hover:text-white/70 transition-colors">0{index + 1}</span>
-                <span className="font-display text-2xl md:text-3xl tracking-tighter group-hover:text-white transition-colors">
+        </div>
+
+        {/* Post Processing Overlays */}
+        <div className="scanlines z-30" />
+        <div className="vignette z-30" />
+
+        {/* Background Text */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0 overflow-hidden">
+          <h2 className="tech-bg-text font-display text-[20vw] text-white/[0.02] leading-none select-none whitespace-nowrap uppercase">
+            Deep Stack
+          </h2>
+        </div>
+
+        {/* 3D World Container */}
+        <div 
+          ref={techContainerRef} 
+          className="relative w-full h-screen flex items-center justify-center z-10"
+          style={{ transformStyle: 'preserve-3d' }}
+        >
+          {skills.map((skill, index) => (
+            <div
+              key={index}
+              className="tech-card absolute flex flex-col justify-between w-[300px] md:w-[380px] h-[450px] bg-[#0a0a0a]/40 backdrop-blur-md border border-white/10 p-8 md:p-10 group hover:border-[#E8175D]"
+              style={{ transformOrigin: 'center center' }}
+            >
+              {/* Corner Accents */}
+              <div className="absolute -top-px -left-px w-4 h-4 border-t border-l border-white/30 group-hover:border-[#E8175D] transition-colors" />
+              <div className="absolute -bottom-px -right-px w-4 h-4 border-b border-r border-white/30 group-hover:border-[#E8175D] transition-colors" />
+              
+              <div className="card-header border-b border-white/10 pb-4 flex justify-between items-center">
+                <span className="font-mono text-[10px] text-[#E8175D] tracking-widest">
+                  ID-{Math.floor(1000 + Math.random() * 9000)}
+                </span>
+                <div className="w-2 h-2 bg-[#E8175D] shadow-[0_0_10px_#E8175D]" />
+              </div>
+
+              <div className="flex-1 flex items-center justify-center">
+                <h3 className="font-display text-5xl md:text-6xl tracking-tighter uppercase leading-none text-center group-hover:text-[#E8175D] transition-colors mix-blend-hard-light">
                   {skill}
+                </h3>
+              </div>
+
+              <div className="card-footer pt-4 border-t border-white/10 flex justify-between items-end">
+                <div className="font-mono text-[8px] text-gray-500 space-y-1">
+                  <div>GRID: {Math.floor(Math.random() * 10)}x{Math.floor(Math.random() * 10)}</div>
+                  <div>DATA_SIZE: {(Math.random() * 100).toFixed(1)}MB</div>
+                </div>
+                <span className="font-mono text-4xl text-white/5 group-hover:text-white/10 transition-colors font-black">
+                  0{index + 1}
                 </span>
               </div>
-            ))}
+            </div>
+          ))}
+        </div>
+
+        {/* HUD Elements */}
+        <div className="absolute inset-8 pointer-events-none z-20 flex flex-col justify-between font-mono text-[10px] text-white/30 uppercase">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-4">
+              <span className="text-[#E8175D]">SYS.READY</span>
+              <div className="w-24 h-px bg-white/20 relative">
+                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-1 bg-[#E8175D]" />
+              </div>
+            </div>
+            <span>LOC: 37.7749° N, 122.4194° W</span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span>SCROLL_VELOCITY // <span id="vel-readout" className="text-[#E8175D]">0.00</span></span>
+            <div className="flex items-center gap-4">
+              <div className="w-24 h-px bg-white/20 relative">
+                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-1 bg-[#E8175D]" />
+              </div>
+              <span>FPS: <span id="fps">60</span></span>
+            </div>
           </div>
         </div>
       </section>
