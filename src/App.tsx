@@ -110,7 +110,7 @@ const ParticleWave = () => {
   return (
     <canvas
       ref={canvasRef}
-      className="absolute inset-0 pointer-events-none opacity-40 z-0"
+      className="absolute top-0 left-0 w-full h-[120%] pointer-events-none opacity-40 z-0"
     />
   );
 };
@@ -186,6 +186,65 @@ const ContactForm = () => {
   );
 };
 
+const CustomCursor = () => {
+  const cursorRef = useRef<HTMLDivElement>(null);
+  const dotRef = useRef<HTMLDivElement>(null);
+  const [isHovering, setIsHovering] = useState(false);
+
+  useEffect(() => {
+    const cursor = cursorRef.current;
+    const dot = dotRef.current;
+    if (!cursor || !dot) return;
+
+    const onMouseMove = (e: MouseEvent) => {
+      gsap.to(cursor, {
+        x: e.clientX,
+        y: e.clientY,
+        duration: 0.5,
+        ease: "power3.out"
+      });
+      gsap.to(dot, {
+        x: e.clientX,
+        y: e.clientY,
+        duration: 0.1,
+        ease: "power2.out"
+      });
+    };
+
+    const onMouseEnter = () => setIsHovering(true);
+    const onMouseLeave = () => setIsHovering(false);
+
+    window.addEventListener("mousemove", onMouseMove);
+    
+    const interactiveElements = document.querySelectorAll('a, button, input, textarea, .group');
+    interactiveElements.forEach(el => {
+      el.addEventListener("mouseenter", onMouseEnter);
+      el.addEventListener("mouseleave", onMouseLeave);
+    });
+
+    return () => {
+      window.removeEventListener("mousemove", onMouseMove);
+      interactiveElements.forEach(el => {
+        el.removeEventListener("mouseenter", onMouseEnter);
+        el.removeEventListener("mouseleave", onMouseLeave);
+      });
+    };
+  }, []);
+
+  return (
+    <>
+      <div
+        ref={cursorRef}
+        className={`fixed top-0 left-0 w-10 h-10 border border-[#E8175D] rounded-full pointer-events-none z-[9999] -translate-x-1/2 -translate-y-1/2 transition-transform duration-300 mix-blend-difference ${isHovering ? 'scale-150 bg-[#E8175D]/10' : 'scale-100'}`}
+      />
+      <div
+        ref={dotRef}
+        className="fixed top-0 left-0 w-1 h-1 bg-[#E8175D] rounded-full pointer-events-none z-[9999] -translate-x-1/2 -translate-y-1/2"
+      />
+    </>
+  );
+};
+
 const ExperienceCard = ({ exp, status, pos }: { exp: any, status: string, pos: string }) => (
   <div className="relative group">
     {/* Red Badge */}
@@ -236,6 +295,17 @@ const ExperienceCard = ({ exp, status, pos }: { exp: any, status: string, pos: s
 
 export default function App() {
   const container = useRef<HTMLDivElement>(null);
+  const experienceRef = useRef<HTMLDivElement>(null);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+
+  const handleExperienceMouseMove = (e: React.MouseEvent) => {
+    if (!experienceRef.current) return;
+    const rect = experienceRef.current.getBoundingClientRect();
+    setMousePos({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
+    });
+  };
 
   const [activeSection, setActiveSection] = useState("home");
 
@@ -391,6 +461,7 @@ export default function App() {
 
   return (
     <div ref={container} className="relative min-h-screen bg-[#0a0a0a] text-white font-sans selection:bg-[#E8175D] selection:text-white">
+      <CustomCursor />
       <SocialBar />
       
       <div className="noise-overlay fixed inset-0 z-0 pointer-events-none" />
@@ -416,7 +487,7 @@ export default function App() {
       </nav>
 
       {/* Hero Section */}
-      <section id="home" className="relative z-10 flex flex-col justify-center min-h-screen px-8 md:px-12 pt-20 overflow-hidden">
+      <section id="home" className="relative z-10 flex flex-col justify-center min-h-screen px-8 md:px-12 pt-20">
         <ParticleWave />
         <GlowingOrbs />
         <div className="max-w-7xl w-full mx-auto relative z-10">
@@ -507,9 +578,22 @@ export default function App() {
       </section>
 
       {/* Experience Section */}
-      <section id="experience" className="relative z-10 py-32 px-8 md:px-12 bg-[#050505] overflow-hidden">
+      <section 
+        id="experience" 
+        ref={experienceRef}
+        onMouseMove={handleExperienceMouseMove}
+        className="relative z-10 py-32 px-8 md:px-12 bg-[#050505] overflow-hidden"
+      >
         {/* Background Grid */}
         <div className="absolute inset-0 pointer-events-none opacity-10" style={{ backgroundImage: 'linear-gradient(#333 1px, transparent 1px), linear-gradient(90deg, #333 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
+        
+        {/* Grid Lighting Effect */}
+        <div 
+          className="absolute inset-0 pointer-events-none opacity-40 transition-opacity duration-300"
+          style={{
+            background: `radial-gradient(circle 300px at ${mousePos.x}px ${mousePos.y}px, rgba(232, 23, 93, 0.15), transparent 80%)`
+          }}
+        />
         
         {/* Decorative Crosshairs in background */}
         <div className="absolute top-20 left-20 text-gray-700 font-mono text-xs">+</div>

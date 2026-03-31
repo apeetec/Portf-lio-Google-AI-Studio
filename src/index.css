@@ -21,6 +21,11 @@ body {
   font-family: var(--font-sans);
   margin: 0;
   overflow-x: hidden;
+  cursor: none;
+}
+
+a, button, input, textarea, select, [role="button"] {
+  cursor: none !important;
 }
 
 ::selection {
