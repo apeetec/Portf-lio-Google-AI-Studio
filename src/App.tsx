@@ -27,6 +27,20 @@ const ParticleWave = () => {
     let time = 0;
     let isVisible = true;
 
+    // Mouse interaction state
+    let targetMouseX = 0;
+    let targetMouseY = 0;
+    let currentMouseX = 0;
+    let currentMouseY = 0;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      // Normalize from -1 to 1
+      targetMouseX = (e.clientX / window.innerWidth) * 2 - 1;
+      targetMouseY = (e.clientY / window.innerHeight) * 2 - 1;
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+
     const resize = () => {
       const parent = canvas.parentElement;
       if (parent) {
@@ -45,13 +59,25 @@ const ParticleWave = () => {
       if (!isVisible) return;
       time += 0.0015; // Slower time step
       
+      // Smoothly interpolate current mouse position
+      currentMouseX += (targetMouseX - currentMouseX) * 0.05;
+      currentMouseY += (targetMouseY - currentMouseY) * 0.05;
+
+      // Calculate scroll factor (1 at top, 0 when scrolled down)
+      const scrollY = window.scrollY;
+      const scrollFactor = Math.max(0, 1 - scrollY / 500);
+
+      // Apply mouse influence scaled by scroll factor
+      const mouseInfluenceX = currentMouseX * 150 * scrollFactor;
+      const mouseInfluenceY = currentMouseY * 150 * scrollFactor;
+
       // Optimization: Use a semi-transparent fill instead of clearRect for a trailing effect, 
       // but clearRect is generally faster. We'll stick to clearRect but optimize the loop.
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.fillStyle = "rgba(255, 255, 255, 0.3)"; // Slightly more transparent
 
-      const cx = canvas.width * 0.85;
-      const cy = canvas.height * 0.5;
+      const cx = canvas.width * 0.85 + mouseInfluenceX;
+      const cy = canvas.height * 0.5 + mouseInfluenceY;
 
       // Aggressive Optimization: Further reduce rings and increase spacing
       const numRings = 30; // Reduced from 40
@@ -78,11 +104,15 @@ const ParticleWave = () => {
           
           const yRotated = Math.sin(angle) * radius * cosTilt - z * sinTilt;
           
-          const px = cx + Math.cos(angle) * radius * scale;
-          const py = cy + yRotated * scale;
+          // Add some individual particle movement based on mouse
+          const particleMouseOffsetX = currentMouseX * (radius * 0.3) * scrollFactor;
+          const particleMouseOffsetY = currentMouseY * (radius * 0.3) * scrollFactor;
+
+          const px = cx + Math.cos(angle) * radius * scale - particleMouseOffsetX;
+          const py = cy + yRotated * scale - particleMouseOffsetY;
 
           // Optimization: Stricter culling
-          if (px > canvas.width * 0.5 && px < canvas.width && py > 0 && py < canvas.height) {
+          if (px > canvas.width * 0.3 && px < canvas.width && py > 0 && py < canvas.height) {
             const size = 1.2 * scale;
             // Instead of fillRect in the loop, we use rect to batch them
             ctx.rect(px, py, size, size);
@@ -113,6 +143,7 @@ const ParticleWave = () => {
 
     return () => {
       window.removeEventListener("resize", resize);
+      window.removeEventListener("mousemove", handleMouseMove);
       cancelAnimationFrame(animationFrameId);
       observer.disconnect();
     };
@@ -121,13 +152,14 @@ const ParticleWave = () => {
   return (
     <canvas
       ref={canvasRef}
-      className="absolute top-0 left-0 w-full h-[120%] pointer-events-none opacity-40 z-0"
+      className="absolute top-0 left-0 w-full h-full pointer-events-none opacity-40 z-0"
+      style={{ maskImage: 'linear-gradient(to bottom, black 50%, transparent 100%)', WebkitMaskImage: 'linear-gradient(to bottom, black 50%, transparent 100%)' }}
     />
   );
 };
 
 const GlowingOrbs = () => (
-  <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+  <div className="absolute inset-0 overflow-hidden pointer-events-none z-0" style={{ maskImage: 'linear-gradient(to bottom, black 50%, transparent 100%)', WebkitMaskImage: 'linear-gradient(to bottom, black 50%, transparent 100%)' }}>
     <div className="absolute top-[-10%] left-[-10%] w-[40vw] h-[40vw] rounded-full bg-[#E8175D]/5 blur-[120px]" />
     <div className="absolute bottom-[-10%] right-[-10%] w-[30vw] h-[30vw] rounded-full bg-[#E8175D]/5 blur-[100px]" />
     <div className="absolute top-[20%] right-[15%] w-[30vw] h-[30vw] border border-[#E8175D]/20 rounded-full animate-[spin_20s_linear_infinite] opacity-30" />

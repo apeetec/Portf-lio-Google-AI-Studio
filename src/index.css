@@ -40,48 +40,91 @@ a, button, input, textarea, select, [role="button"] {
 }
 
 .noise-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0.03;
+  position: fixed;
+  inset: 0;
+  z-index: 12;
+  opacity: 0.07;
   pointer-events: none;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
 }
 
 .scanlines {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    to bottom,
-    rgba(255, 255, 255, 0) 50%,
-    rgba(0, 0, 0, 0.1) 50%
-  );
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(to bottom,
+          rgba(255, 255, 255, 0),
+          rgba(255, 255, 255, 0) 50%,
+          rgba(0, 0, 0, 0.2) 50%,
+          rgba(0, 0, 0, 0.2));
   background-size: 100% 4px;
   pointer-events: none;
-  opacity: 0.1;
+  z-index: 10;
 }
 
 .vignette {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: radial-gradient(circle at 50% 50%, transparent 0%, rgba(0, 0, 0, 0.8) 100%);
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle, transparent 40%, #000 120%);
+  z-index: 11;
   pointer-events: none;
 }
 
 .wavy-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  position: fixed;
+  inset: 0;
   background: radial-gradient(circle at 50% 50%, transparent 0%, rgba(10, 10, 10, 0.9) 100%);
   pointer-events: none;
+  z-index: 1;
+}
+
+/* --- CYBERPUNK TECH SECTION --- */
+.cyber-card {
+  background: rgba(10, 10, 10, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.5), 0 20px 50px rgba(0, 0, 0, 0.5);
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+@media (hover: hover) {
+  .cyber-card:hover {
+    border-color: #ff003c;
+    box-shadow: 0 0 30px rgba(255, 0, 60, 0.2);
+    background: rgba(20, 20, 20, 0.8);
+    z-index: 100;
+  }
+}
+
+.cyber-card::before,
+.cyber-card::after {
+  content: '';
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border: 1px solid transparent;
+  transition: 0.3s;
+  pointer-events: none;
+}
+
+.cyber-card::before {
+  top: -1px;
+  left: -1px;
+  border-top-color: #e0e0e0;
+  border-left-color: #e0e0e0;
+}
+
+.cyber-card::after {
+  bottom: -1px;
+  right: -1px;
+  border-bottom-color: #e0e0e0;
+  border-right-color: #e0e0e0;
+}
+
+.cyber-card:hover::before,
+.cyber-card:hover::after {
+  width: 100%;
+  height: 100%;
+  border-color: #ff003c;
 }
