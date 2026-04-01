@@ -43,13 +43,20 @@ const ParticleWave = () => {
 
     const resize = () => {
       const parent = canvas.parentElement;
+      const dpr = window.devicePixelRatio || 1;
+      let w, h;
       if (parent) {
-        canvas.width = parent.clientWidth;
-        canvas.height = parent.clientHeight;
+        w = parent.clientWidth;
+        h = parent.clientHeight;
       } else {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+        w = window.innerWidth;
+        h = window.innerHeight;
       }
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      canvas.style.width = `${w}px`;
+      canvas.style.height = `${h}px`;
+      ctx.scale(dpr, dpr);
     };
 
     window.addEventListener("resize", resize);
@@ -74,7 +81,7 @@ const ParticleWave = () => {
       // Optimization: Use a semi-transparent fill instead of clearRect for a trailing effect, 
       // but clearRect is generally faster. We'll stick to clearRect but optimize the loop.
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = "rgba(255, 255, 255, 0.3)"; // Slightly more transparent
+      ctx.fillStyle = "rgba(255, 255, 255, 0.5)"; // Slightly more opaque
 
       const cx = canvas.width * 0.85 + mouseInfluenceX;
       const cy = canvas.height * 0.5 + mouseInfluenceY;
@@ -152,7 +159,7 @@ const ParticleWave = () => {
   return (
     <canvas
       ref={canvasRef}
-      className="absolute top-0 left-0 w-full h-full pointer-events-none opacity-40 z-0"
+      className="absolute top-0 left-0 w-full h-full pointer-events-none opacity-70 z-0"
       style={{ maskImage: 'linear-gradient(to bottom, black 50%, transparent 100%)', WebkitMaskImage: 'linear-gradient(to bottom, black 50%, transparent 100%)' }}
     />
   );
@@ -205,9 +212,9 @@ const SectionHeader = ({ number, title }: { number: string; title: string }) => 
 
   return (
     <div className="section-header flex items-center gap-4 mb-12">
-      <span className="font-mono text-xs text-gray-600">{number}</span>
-      <div className="h-[1px] flex-1 bg-gray-800" />
-      <h2 ref={headerRef} className="font-display text-4xl md:text-6xl uppercase tracking-tighter overflow-hidden">
+      <span className="font-mono text-xs text-gray-600 shrink-0">{number}</span>
+      <div className="h-[1px] flex-1 bg-gray-800 min-w-[20px]" />
+      <h2 ref={headerRef} className="font-display text-3xl sm:text-4xl md:text-6xl uppercase tracking-tighter overflow-hidden break-words whitespace-normal shrink">
         {title}
       </h2>
     </div>
@@ -367,6 +374,161 @@ const ExperienceCard = ({ exp, status, pos }: { exp: any, status: string, pos: s
     <div className="absolute top-1/2 -right-2 w-4 h-[1px] bg-gray-700 z-10" />
   </div>
 );
+
+const TechBackground = () => (
+  <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden opacity-30">
+    {/* Top Left */}
+    <svg className="absolute top-0 left-0 w-96 h-96" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M 0 100 L 150 100 L 200 50 L 350 50" stroke="#E8175D" strokeWidth="1" strokeDasharray="4 4" />
+      <circle cx="150" cy="100" r="3" fill="#E8175D" />
+      <circle cx="200" cy="50" r="3" fill="#E8175D" />
+      <circle cx="350" cy="50" r="4" stroke="#E8175D" strokeWidth="2" />
+      <path d="M 50 0 L 50 150 L 100 200 L 100 350" stroke="#4ade80" strokeWidth="1" strokeDasharray="4 4" opacity="0.5" />
+      <circle cx="50" cy="150" r="3" fill="#4ade80" opacity="0.5" />
+      <circle cx="100" cy="200" r="3" fill="#4ade80" opacity="0.5" />
+    </svg>
+
+    {/* Top Right */}
+    <svg className="absolute top-0 right-0 w-96 h-96" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M 400 150 L 250 150 L 200 200 L 50 200" stroke="#4ade80" strokeWidth="1" strokeDasharray="4 4" />
+      <circle cx="250" cy="150" r="3" fill="#4ade80" />
+      <circle cx="200" cy="200" r="3" fill="#4ade80" />
+      <circle cx="50" cy="200" r="4" stroke="#4ade80" strokeWidth="2" />
+      <path d="M 350 0 L 350 100 L 300 150 L 300 300" stroke="#E8175D" strokeWidth="1" strokeDasharray="4 4" opacity="0.5" />
+      <circle cx="350" cy="100" r="3" fill="#E8175D" opacity="0.5" />
+      <circle cx="300" cy="150" r="3" fill="#E8175D" opacity="0.5" />
+    </svg>
+
+    {/* Bottom Left */}
+    <svg className="absolute bottom-0 left-0 w-96 h-96" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M 50 400 L 50 250 L 100 200 L 100 50" stroke="#4ade80" strokeWidth="1" strokeDasharray="4 4" />
+      <circle cx="50" cy="250" r="3" fill="#4ade80" />
+      <circle cx="100" cy="200" r="3" fill="#4ade80" />
+      <circle cx="100" cy="50" r="4" stroke="#4ade80" strokeWidth="2" />
+      <path d="M 0 300 L 150 300 L 200 250 L 350 250" stroke="#E8175D" strokeWidth="1" strokeDasharray="4 4" opacity="0.5" />
+      <circle cx="150" cy="300" r="3" fill="#E8175D" opacity="0.5" />
+      <circle cx="200" cy="250" r="3" fill="#E8175D" opacity="0.5" />
+    </svg>
+
+    {/* Bottom Right */}
+    <svg className="absolute bottom-0 right-0 w-96 h-96" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M 300 400 L 300 250 L 250 200 L 250 50" stroke="#E8175D" strokeWidth="1" strokeDasharray="4 4" />
+      <circle cx="300" cy="250" r="3" fill="#E8175D" />
+      <circle cx="250" cy="200" r="3" fill="#E8175D" />
+      <circle cx="250" cy="50" r="4" stroke="#E8175D" strokeWidth="2" />
+      <path d="M 400 300 L 250 300 L 200 250 L 50 250" stroke="#4ade80" strokeWidth="1" strokeDasharray="4 4" opacity="0.5" />
+      <circle cx="250" cy="300" r="3" fill="#4ade80" opacity="0.5" />
+      <circle cx="200" cy="250" r="3" fill="#4ade80" opacity="0.5" />
+    </svg>
+  </div>
+);
+
+const EducationSection = () => {
+  return (
+    <section id="education" className="relative z-10 py-32 px-8 md:px-12">
+      <TechBackground />
+      <div className="max-w-7xl w-full mx-auto relative z-10">
+        <SectionHeader number="04" title="ACADEMIC BACKGROUND" />
+        
+        {/* Editor Window */}
+        <div className="mt-12 rounded-lg overflow-hidden border border-gray-800/60 bg-[#121212] shadow-2xl flex flex-col relative">
+          
+          {/* Top Bar */}
+          <div className="h-12 bg-[#1a1a1a] border-b border-gray-800/60 flex items-center px-6 gap-4">
+            <div className="text-[#4ade80] font-mono text-sm tracking-wide">GabrielDev</div>
+          </div>
+          
+          {/* Secondary Bar (Tabs/Controls) */}
+          <div className="h-10 bg-[#161616] border-b border-gray-800/60 flex items-center px-4 gap-4">
+            <div className="w-6 h-6 rounded border border-gray-600/50 flex items-center justify-center">
+              <div className="w-2 h-2 rounded-full bg-gray-400"></div>
+            </div>
+            <div className="flex gap-2">
+              <div className="h-4 w-24 rounded-full bg-gray-800/50"></div>
+              <div className="h-4 w-16 rounded-full bg-gray-800/50"></div>
+              <div className="h-4 w-32 rounded-full bg-gray-800/50"></div>
+            </div>
+          </div>
+
+          {/* Main Content */}
+          <div className="flex flex-1">
+            {/* Left Sidebar */}
+            <div className="w-14 bg-[#161616] border-r border-gray-800/60 flex flex-col items-center py-4 gap-4">
+              <div className="w-6 h-6 rounded-md bg-gray-800/80"></div>
+              <div className="w-6 h-6 rounded-md bg-gray-800/40"></div>
+              <div className="w-6 h-6 rounded-md bg-gray-800/40"></div>
+              <div className="w-6 h-6 rounded-md bg-gray-800/40"></div>
+              <div className="w-6 h-6 rounded-md bg-gray-800/40"></div>
+            </div>
+
+            {/* Code Area */}
+            <div className="flex-1 flex overflow-x-auto p-6 font-mono text-[13px] md:text-sm leading-[1.7]">
+              {/* Line Numbers */}
+              <div className="flex flex-col text-gray-600 text-right pr-6 select-none opacity-50">
+                {Array.from({ length: 28 }).map((_, i) => (
+                  <span key={i}>{i + 1}</span>
+                ))}
+              </div>
+              
+              {/* Code Content */}
+              <div className="flex flex-col text-gray-300 whitespace-pre">
+                <div><span className="text-gray-500">&lt;</span><span className="text-[#E8175D]">AcademicBackground</span><span className="text-gray-500">&gt;</span></div>
+                
+                {/* Item 1 */}
+                <div className="ml-4"><span className="text-gray-500">&lt;</span><span className="text-[#E8175D]">Degree</span></div>
+                <div className="ml-8"><span className="text-blue-400">title</span><span className="text-white">=</span><span className="text-green-400">"Systems Analysis and Development"</span></div>
+                <div className="ml-8"><span className="text-blue-400">period</span><span className="text-white">=</span><span className="text-green-400">"2022 - 2024"</span></div>
+                <div className="ml-8"><span className="text-blue-400">institution</span><span className="text-white">=</span><span className="text-green-400">"Universidade Anhembi Morumbi"</span><span className="text-gray-500">&gt;</span></div>
+                <div className="ml-8"><span className="text-gray-500">&lt;</span><span className="text-[#E8175D]">Skills</span><span className="text-gray-500">&gt;</span></div>
+                <div className="ml-12 text-gray-400">Advanced web development, information security, software modeling</div>
+                <div className="ml-8"><span className="text-gray-500">&lt;/</span><span className="text-[#E8175D]">Skills</span><span className="text-gray-500">&gt;</span></div>
+                <div className="ml-4"><span className="text-gray-500">&lt;/</span><span className="text-[#E8175D]">Degree</span><span className="text-gray-500">&gt;</span></div>
+                <div></div>
+
+                {/* Item 2 */}
+                <div className="ml-4"><span className="text-gray-500">&lt;</span><span className="text-[#E8175D]">Degree</span></div>
+                <div className="ml-8"><span className="text-blue-400">title</span><span className="text-white">=</span><span className="text-green-400">"Internet Informatics (Technician)"</span></div>
+                <div className="ml-8"><span className="text-blue-400">period</span><span className="text-white">=</span><span className="text-green-400">"2020 - 2021"</span></div>
+                <div className="ml-8"><span className="text-blue-400">institution</span><span className="text-white">=</span><span className="text-green-400">"ETEC Centro Paula Souza"</span><span className="text-gray-500">&gt;</span></div>
+                <div className="ml-8"><span className="text-gray-500">&lt;</span><span className="text-[#E8175D]">Skills</span><span className="text-gray-500">&gt;</span></div>
+                <div className="ml-12 text-gray-400">Programming, databases, systems integration, front-end/back-end</div>
+                <div className="ml-8"><span className="text-gray-500">&lt;/</span><span className="text-[#E8175D]">Skills</span><span className="text-gray-500">&gt;</span></div>
+                <div className="ml-4"><span className="text-gray-500">&lt;/</span><span className="text-[#E8175D]">Degree</span><span className="text-gray-500">&gt;</span></div>
+                <div></div>
+
+                {/* Item 3 */}
+                <div className="ml-4"><span className="text-gray-500">&lt;</span><span className="text-[#E8175D]">Degree</span></div>
+                <div className="ml-8"><span className="text-blue-400">title</span><span className="text-white">=</span><span className="text-green-400">"Mechatronics"</span></div>
+                <div className="ml-8"><span className="text-blue-400">period</span><span className="text-white">=</span><span className="text-green-400">"2013 - 2015"</span></div>
+                <div className="ml-8"><span className="text-blue-400">institution</span><span className="text-white">=</span><span className="text-green-400">"Senai Roberto Mange"</span><span className="text-gray-500">&gt;</span></div>
+                <div className="ml-8"><span className="text-gray-500">&lt;</span><span className="text-[#E8175D]">Description</span><span className="text-gray-500">&gt;</span></div>
+                <div className="ml-12 text-gray-400 whitespace-normal max-w-2xl">Implementation, maintenance, and development of automated systems and equipment, focusing on technical standards, quality, workplace safety, and sustainability.</div>
+                <div className="ml-8"><span className="text-gray-500">&lt;/</span><span className="text-[#E8175D]">Description</span><span className="text-gray-500">&gt;</span></div>
+                <div className="ml-4"><span className="text-gray-500">&lt;/</span><span className="text-[#E8175D]">Degree</span><span className="text-gray-500">&gt;</span></div>
+
+                <div><span className="text-gray-500">&lt;/</span><span className="text-[#E8175D]">AcademicBackground</span><span className="text-gray-500">&gt;</span></div>
+              </div>
+            </div>
+
+            {/* Right Panel */}
+            <div className="hidden lg:block w-64 bg-[#161616] border-l border-gray-800/60 p-6 font-mono text-[11px] text-gray-400 leading-relaxed">
+              <div className="text-gray-300 mb-2">Properties</div>
+              <div className="text-[#4ade80]">status="graduated"</div>
+              <div className="text-[#4ade80]">focus="fullstack"</div>
+              <div className="text-[#4ade80]">passion="high"</div>
+              <br/>
+              <div className="text-gray-500">
+                // Continuous learning<br/>
+                // Always upgrading skills<br/>
+                // Building the future
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
 
 export default function App() {
   const container = useRef<HTMLDivElement>(null);
@@ -603,8 +765,9 @@ export default function App() {
     { id: "01", label: "HOME", href: "#home" },
     { id: "02", label: "PROJECTS", href: "#projects" },
     { id: "03", label: "EXPERIENCE", href: "#experience" },
-    { id: "04", label: "TECHNOLOGIES", href: "#skills" },
-    { id: "05", label: "CONTACT", href: "#contact" },
+    { id: "04", label: "EDUCATION", href: "#education" },
+    { id: "05", label: "TECHNOLOGIES", href: "#skills" },
+    { id: "06", label: "CONTACT", href: "#contact" },
   ];
 
   const experiences = [
@@ -831,6 +994,8 @@ export default function App() {
         </div>
       </section>
 
+      <EducationSection />
+
       {/* Technologies Section */}
       <section 
         id="skills" 
@@ -838,8 +1003,8 @@ export default function App() {
         className="relative z-10 bg-[#030303] overflow-hidden min-h-screen flex flex-col justify-center"
         style={{ perspective: '1000px' }}
       >
-        <div className="absolute top-20 left-8 md:left-12 z-20 w-full max-w-7xl mx-auto">
-          <SectionHeader number="04" title="TECHNOLOGIES" />
+        <div className="absolute top-20 left-0 right-0 px-8 md:px-12 z-20 w-full max-w-7xl mx-auto">
+          <SectionHeader number="05" title="TECHNOLOGIES" />
         </div>
 
         {/* Post Processing Overlays */}
@@ -921,7 +1086,7 @@ export default function App() {
       {/* Contact Section */}
       <section id="contact" className="relative z-10 py-32 px-8 md:px-12">
         <div className="max-w-7xl w-full mx-auto">
-          <SectionHeader number="05" title="GET IN TOUCH" />
+          <SectionHeader number="06" title="GET IN TOUCH" />
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-24">
             <div className="space-y-8">
