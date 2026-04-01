@@ -4,7 +4,7 @@
  */
 
 import React, { useEffect, useRef, useState } from "react";
-import { Github, Linkedin, Mail, Twitter, ArrowUpRight } from "lucide-react";
+import { Github, Linkedin, Mail, Twitter, ArrowUpRight, Files, Search, GitBranch, Play, LayoutGrid, Settings, ChevronRight, ChevronDown, X, FileCode2 } from "lucide-react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -431,97 +431,202 @@ const EducationSection = () => {
         <SectionHeader number="04" title="ACADEMIC BACKGROUND" />
         
         {/* Editor Window */}
-        <div className="mt-12 rounded-lg overflow-hidden border border-gray-800/60 bg-[#121212] shadow-2xl flex flex-col relative">
+        <div className="mt-12 rounded-lg overflow-hidden border border-[#333333] bg-[#1e1e1e] shadow-2xl flex flex-col relative font-sans">
           
-          {/* Top Bar */}
-          <div className="h-12 bg-[#1a1a1a] border-b border-gray-800/60 flex items-center px-6 gap-4">
-            <div className="text-[#4ade80] font-mono text-sm tracking-wide">GabrielDev</div>
+          {/* Title Bar */}
+          <div className="h-8 bg-[#323233] flex items-center px-4 justify-between select-none">
+            {/* Window Controls (Mac) */}
+            <div className="flex gap-2 w-20">
+              <div className="w-3 h-3 rounded-full bg-[#ff5f56]"></div>
+              <div className="w-3 h-3 rounded-full bg-[#ffbd2e]"></div>
+              <div className="w-3 h-3 rounded-full bg-[#27c93f]"></div>
+            </div>
+            {/* Title */}
+            <div className="text-[#cccccc] text-xs flex-1 text-center">
+              App.tsx - GabrielDev - Visual Studio Code
+            </div>
+            {/* Spacer for balance */}
+            <div className="w-20"></div>
           </div>
           
-          {/* Secondary Bar (Tabs/Controls) */}
-          <div className="h-10 bg-[#161616] border-b border-gray-800/60 flex items-center px-4 gap-4">
-            <div className="w-6 h-6 rounded border border-gray-600/50 flex items-center justify-center">
-              <div className="w-2 h-2 rounded-full bg-gray-400"></div>
-            </div>
-            <div className="flex gap-2">
-              <div className="h-4 w-24 rounded-full bg-gray-800/50"></div>
-              <div className="h-4 w-16 rounded-full bg-gray-800/50"></div>
-              <div className="h-4 w-32 rounded-full bg-gray-800/50"></div>
-            </div>
-          </div>
-
-          {/* Main Content */}
-          <div className="flex flex-1">
-            {/* Left Sidebar */}
-            <div className="w-14 bg-[#161616] border-r border-gray-800/60 flex flex-col items-center py-4 gap-4">
-              <div className="w-6 h-6 rounded-md bg-gray-800/80"></div>
-              <div className="w-6 h-6 rounded-md bg-gray-800/40"></div>
-              <div className="w-6 h-6 rounded-md bg-gray-800/40"></div>
-              <div className="w-6 h-6 rounded-md bg-gray-800/40"></div>
-              <div className="w-6 h-6 rounded-md bg-gray-800/40"></div>
-            </div>
-
-            {/* Code Area */}
-            <div className="flex-1 flex overflow-x-auto p-6 font-mono text-[13px] md:text-sm leading-[1.7]">
-              {/* Line Numbers */}
-              <div className="flex flex-col text-gray-600 text-right pr-6 select-none opacity-50">
-                {Array.from({ length: 28 }).map((_, i) => (
-                  <span key={i}>{i + 1}</span>
-                ))}
+          <div className="flex flex-1 h-[600px]">
+            {/* Activity Bar */}
+            <div className="w-12 bg-[#333333] flex flex-col items-center py-4 justify-between">
+              <div className="flex flex-col gap-6 text-[#858585]">
+                <Files size={24} className="text-white cursor-pointer" />
+                <Search size={24} className="cursor-pointer hover:text-white transition-colors" />
+                <GitBranch size={24} className="cursor-pointer hover:text-white transition-colors" />
+                <Play size={24} className="cursor-pointer hover:text-white transition-colors" />
+                <LayoutGrid size={24} className="cursor-pointer hover:text-white transition-colors" />
               </div>
-              
-              {/* Code Content */}
-              <div className="flex flex-col text-gray-300 whitespace-pre">
-                <div><span className="text-gray-500">&lt;</span><span className="text-[#E8175D]">AcademicBackground</span><span className="text-gray-500">&gt;</span></div>
+              <div className="flex flex-col gap-6 text-[#858585]">
+                <Settings size={24} className="cursor-pointer hover:text-white transition-colors" />
+              </div>
+            </div>
+
+            {/* Sidebar (Explorer) */}
+            <div className="w-60 bg-[#252526] flex-col hidden md:flex border-r border-[#333333]">
+              <div className="text-[#cccccc] text-[11px] uppercase tracking-wider px-4 py-3">
+                Explorer
+              </div>
+              <div className="flex flex-col text-[#cccccc] text-sm">
+                <div className="flex items-center gap-1 px-2 py-1 cursor-pointer hover:bg-[#2a2d2e]">
+                  <ChevronDown size={16} />
+                  <span className="font-bold text-xs">PORTFOLIO</span>
+                </div>
+                <div className="flex flex-col">
+                  <div className="flex items-center gap-1 px-4 py-1 cursor-pointer hover:bg-[#2a2d2e]">
+                    <ChevronDown size={16} />
+                    <span>src</span>
+                  </div>
+                  <div className="flex items-center gap-2 px-8 py-1 bg-[#37373d] text-white cursor-pointer">
+                    <FileCode2 size={16} className="text-[#519aba]" />
+                    <span>App.tsx</span>
+                  </div>
+                  <div className="flex items-center gap-2 px-8 py-1 cursor-pointer hover:bg-[#2a2d2e]">
+                    <FileCode2 size={16} className="text-[#519aba]" />
+                    <span>index.css</span>
+                  </div>
+                  <div className="flex items-center gap-2 px-8 py-1 cursor-pointer hover:bg-[#2a2d2e]">
+                    <FileCode2 size={16} className="text-[#cbcb41]" />
+                    <span>main.tsx</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Main Editor Area */}
+            <div className="flex-1 flex flex-col bg-[#1e1e1e] overflow-hidden">
+              {/* Tabs */}
+              <div className="flex h-9 bg-[#252526] overflow-x-auto no-scrollbar">
+                <div className="flex items-center gap-2 px-4 bg-[#1e1e1e] border-t border-[#E8175D] text-white cursor-pointer min-w-fit">
+                  <FileCode2 size={16} className="text-[#519aba]" />
+                  <span className="text-sm">App.tsx</span>
+                  <X size={14} className="ml-2 text-[#858585] hover:text-white rounded hover:bg-[#333333]" />
+                </div>
+                <div className="flex items-center gap-2 px-4 text-[#858585] hover:bg-[#2d2d2d] cursor-pointer min-w-fit">
+                  <FileCode2 size={16} className="text-[#519aba]" />
+                  <span className="text-sm">index.css</span>
+                </div>
+              </div>
+
+              {/* Breadcrumbs */}
+              <div className="flex items-center gap-1 px-4 h-6 text-[#cccccc] text-xs border-b border-[#333333]">
+                <span>src</span>
+                <ChevronRight size={14} />
+                <FileCode2 size={14} className="text-[#519aba]" />
+                <span>App.tsx</span>
+                <ChevronRight size={14} />
+                <span>AcademicBackground</span>
+              </div>
+
+              {/* Code Area */}
+              <div className="flex-1 flex overflow-auto p-4 font-mono text-[13px] md:text-sm leading-[1.6]">
+                {/* Line Numbers */}
+                <div className="flex flex-col text-[#858585] text-right pr-6 select-none">
+                  {Array.from({ length: 28 }).map((_, i) => (
+                    <span key={i}>{i + 1}</span>
+                  ))}
+                </div>
                 
-                {/* Item 1 */}
-                <div className="ml-4"><span className="text-gray-500">&lt;</span><span className="text-[#E8175D]">Degree</span></div>
-                <div className="ml-8"><span className="text-blue-400">title</span><span className="text-white">=</span><span className="text-green-400">"Systems Analysis and Development"</span></div>
-                <div className="ml-8"><span className="text-blue-400">period</span><span className="text-white">=</span><span className="text-green-400">"2022 - 2024"</span></div>
-                <div className="ml-8"><span className="text-blue-400">institution</span><span className="text-white">=</span><span className="text-green-400">"Universidade Anhembi Morumbi"</span><span className="text-gray-500">&gt;</span></div>
-                <div className="ml-8"><span className="text-gray-500">&lt;</span><span className="text-[#E8175D]">Skills</span><span className="text-gray-500">&gt;</span></div>
-                <div className="ml-12 text-gray-400">Advanced web development, information security, software modeling</div>
-                <div className="ml-8"><span className="text-gray-500">&lt;/</span><span className="text-[#E8175D]">Skills</span><span className="text-gray-500">&gt;</span></div>
-                <div className="ml-4"><span className="text-gray-500">&lt;/</span><span className="text-[#E8175D]">Degree</span><span className="text-gray-500">&gt;</span></div>
-                <div></div>
+                {/* Code Content */}
+                <div className="flex flex-col text-[#d4d4d4] whitespace-pre">
+                  <div><span className="text-[#808080]">&lt;</span><span className="text-[#569cd6]">AcademicBackground</span><span className="text-[#808080]">&gt;</span></div>
+                  
+                  {/* Item 1 */}
+                  <div className="ml-4"><span className="text-[#808080]">&lt;</span><span className="text-[#4ec9b0]">Degree</span></div>
+                  <div className="ml-8"><span className="text-[#9cdcfe]">title</span><span className="text-[#d4d4d4]">=</span><span className="text-[#ce9178]">"Systems Analysis and Development"</span></div>
+                  <div className="ml-8"><span className="text-[#9cdcfe]">period</span><span className="text-[#d4d4d4]">=</span><span className="text-[#ce9178]">"2022 - 2024"</span></div>
+                  <div className="ml-8"><span className="text-[#9cdcfe]">institution</span><span className="text-[#d4d4d4]">=</span><span className="text-[#ce9178]">"Universidade Anhembi Morumbi"</span><span className="text-[#808080]">&gt;</span></div>
+                  <div className="ml-8"><span className="text-[#808080]">&lt;</span><span className="text-[#4ec9b0]">Skills</span><span className="text-[#808080]">&gt;</span></div>
+                  <div className="ml-12 text-[#ce9178]">Advanced web development, information security, software modeling</div>
+                  <div className="ml-8"><span className="text-[#808080]">&lt;/</span><span className="text-[#4ec9b0]">Skills</span><span className="text-[#808080]">&gt;</span></div>
+                  <div className="ml-4"><span className="text-[#808080]">&lt;/</span><span className="text-[#4ec9b0]">Degree</span><span className="text-[#808080]">&gt;</span></div>
+                  <div></div>
 
-                {/* Item 2 */}
-                <div className="ml-4"><span className="text-gray-500">&lt;</span><span className="text-[#E8175D]">Degree</span></div>
-                <div className="ml-8"><span className="text-blue-400">title</span><span className="text-white">=</span><span className="text-green-400">"Internet Informatics (Technician)"</span></div>
-                <div className="ml-8"><span className="text-blue-400">period</span><span className="text-white">=</span><span className="text-green-400">"2020 - 2021"</span></div>
-                <div className="ml-8"><span className="text-blue-400">institution</span><span className="text-white">=</span><span className="text-green-400">"ETEC Centro Paula Souza"</span><span className="text-gray-500">&gt;</span></div>
-                <div className="ml-8"><span className="text-gray-500">&lt;</span><span className="text-[#E8175D]">Skills</span><span className="text-gray-500">&gt;</span></div>
-                <div className="ml-12 text-gray-400">Programming, databases, systems integration, front-end/back-end</div>
-                <div className="ml-8"><span className="text-gray-500">&lt;/</span><span className="text-[#E8175D]">Skills</span><span className="text-gray-500">&gt;</span></div>
-                <div className="ml-4"><span className="text-gray-500">&lt;/</span><span className="text-[#E8175D]">Degree</span><span className="text-gray-500">&gt;</span></div>
-                <div></div>
+                  {/* Item 2 */}
+                  <div className="ml-4"><span className="text-[#808080]">&lt;</span><span className="text-[#4ec9b0]">Degree</span></div>
+                  <div className="ml-8"><span className="text-[#9cdcfe]">title</span><span className="text-[#d4d4d4]">=</span><span className="text-[#ce9178]">"Internet Informatics (Technician)"</span></div>
+                  <div className="ml-8"><span className="text-[#9cdcfe]">period</span><span className="text-[#d4d4d4]">=</span><span className="text-[#ce9178]">"2020 - 2021"</span></div>
+                  <div className="ml-8"><span className="text-[#9cdcfe]">institution</span><span className="text-[#d4d4d4]">=</span><span className="text-[#ce9178]">"ETEC Centro Paula Souza"</span><span className="text-[#808080]">&gt;</span></div>
+                  <div className="ml-8"><span className="text-[#808080]">&lt;</span><span className="text-[#4ec9b0]">Skills</span><span className="text-[#808080]">&gt;</span></div>
+                  <div className="ml-12 text-[#ce9178]">Programming, databases, systems integration, front-end/back-end</div>
+                  <div className="ml-8"><span className="text-[#808080]">&lt;/</span><span className="text-[#4ec9b0]">Skills</span><span className="text-[#808080]">&gt;</span></div>
+                  <div className="ml-4"><span className="text-[#808080]">&lt;/</span><span className="text-[#4ec9b0]">Degree</span><span className="text-[#808080]">&gt;</span></div>
+                  <div></div>
 
-                {/* Item 3 */}
-                <div className="ml-4"><span className="text-gray-500">&lt;</span><span className="text-[#E8175D]">Degree</span></div>
-                <div className="ml-8"><span className="text-blue-400">title</span><span className="text-white">=</span><span className="text-green-400">"Mechatronics"</span></div>
-                <div className="ml-8"><span className="text-blue-400">period</span><span className="text-white">=</span><span className="text-green-400">"2013 - 2015"</span></div>
-                <div className="ml-8"><span className="text-blue-400">institution</span><span className="text-white">=</span><span className="text-green-400">"Senai Roberto Mange"</span><span className="text-gray-500">&gt;</span></div>
-                <div className="ml-8"><span className="text-gray-500">&lt;</span><span className="text-[#E8175D]">Description</span><span className="text-gray-500">&gt;</span></div>
-                <div className="ml-12 text-gray-400 whitespace-normal max-w-2xl">Implementation, maintenance, and development of automated systems and equipment, focusing on technical standards, quality, workplace safety, and sustainability.</div>
-                <div className="ml-8"><span className="text-gray-500">&lt;/</span><span className="text-[#E8175D]">Description</span><span className="text-gray-500">&gt;</span></div>
-                <div className="ml-4"><span className="text-gray-500">&lt;/</span><span className="text-[#E8175D]">Degree</span><span className="text-gray-500">&gt;</span></div>
+                  {/* Item 3 */}
+                  <div className="ml-4"><span className="text-[#808080]">&lt;</span><span className="text-[#4ec9b0]">Degree</span></div>
+                  <div className="ml-8"><span className="text-[#9cdcfe]">title</span><span className="text-[#d4d4d4]">=</span><span className="text-[#ce9178]">"Mechatronics"</span></div>
+                  <div className="ml-8"><span className="text-[#9cdcfe]">period</span><span className="text-[#d4d4d4]">=</span><span className="text-[#ce9178]">"2013 - 2015"</span></div>
+                  <div className="ml-8"><span className="text-[#9cdcfe]">institution</span><span className="text-[#d4d4d4]">=</span><span className="text-[#ce9178]">"Senai Roberto Mange"</span><span className="text-[#808080]">&gt;</span></div>
+                  <div className="ml-8"><span className="text-[#808080]">&lt;</span><span className="text-[#4ec9b0]">Description</span><span className="text-[#808080]">&gt;</span></div>
+                  <div className="ml-12 text-[#ce9178] whitespace-normal max-w-2xl">Implementation, maintenance, and development of automated systems and equipment, focusing on technical standards, quality, workplace safety, and sustainability.</div>
+                  <div className="ml-8"><span className="text-[#808080]">&lt;/</span><span className="text-[#4ec9b0]">Description</span><span className="text-[#808080]">&gt;</span></div>
+                  <div className="ml-4"><span className="text-[#808080]">&lt;/</span><span className="text-[#4ec9b0]">Degree</span><span className="text-[#808080]">&gt;</span></div>
 
-                <div><span className="text-gray-500">&lt;/</span><span className="text-[#E8175D]">AcademicBackground</span><span className="text-gray-500">&gt;</span></div>
+                  <div><span className="text-[#808080]">&lt;/</span><span className="text-[#569cd6]">AcademicBackground</span><span className="text-[#808080]">&gt;</span></div>
+                </div>
               </div>
             </div>
 
-            {/* Right Panel */}
-            <div className="hidden lg:block w-64 bg-[#161616] border-l border-gray-800/60 p-6 font-mono text-[11px] text-gray-400 leading-relaxed">
-              <div className="text-gray-300 mb-2">Properties</div>
-              <div className="text-[#4ade80]">status="graduated"</div>
-              <div className="text-[#4ade80]">focus="fullstack"</div>
-              <div className="text-[#4ade80]">passion="high"</div>
-              <br/>
-              <div className="text-gray-500">
-                // Continuous learning<br/>
-                // Always upgrading skills<br/>
-                // Building the future
+            {/* Right Panel (Minimap simulation) */}
+            <div className="hidden lg:block w-16 bg-[#1e1e1e] border-l border-[#333333] relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-full h-32 bg-[#ffffff05] border-l-2 border-[#85858540]"></div>
+              {/* Minimap lines */}
+              <div className="p-2 opacity-30 flex flex-col gap-[2px]">
+                <div className="w-full h-[2px] bg-[#569cd6]"></div>
+                <div className="w-3/4 h-[2px] bg-[#4ec9b0] ml-2"></div>
+                <div className="w-1/2 h-[2px] bg-[#9cdcfe] ml-4"></div>
+                <div className="w-1/2 h-[2px] bg-[#9cdcfe] ml-4"></div>
+                <div className="w-1/2 h-[2px] bg-[#9cdcfe] ml-4"></div>
+                <div className="w-3/4 h-[2px] bg-[#4ec9b0] ml-4"></div>
+                <div className="w-full h-[2px] bg-[#ce9178] ml-6"></div>
+                <div className="w-3/4 h-[2px] bg-[#4ec9b0] ml-4"></div>
+                <div className="w-3/4 h-[2px] bg-[#4ec9b0] ml-2"></div>
+                <div className="h-2"></div>
+                <div className="w-3/4 h-[2px] bg-[#4ec9b0] ml-2"></div>
+                <div className="w-1/2 h-[2px] bg-[#9cdcfe] ml-4"></div>
+                <div className="w-1/2 h-[2px] bg-[#9cdcfe] ml-4"></div>
+                <div className="w-1/2 h-[2px] bg-[#9cdcfe] ml-4"></div>
+                <div className="w-3/4 h-[2px] bg-[#4ec9b0] ml-4"></div>
+                <div className="w-full h-[2px] bg-[#ce9178] ml-6"></div>
+                <div className="w-3/4 h-[2px] bg-[#4ec9b0] ml-4"></div>
+                <div className="w-3/4 h-[2px] bg-[#4ec9b0] ml-2"></div>
+                <div className="h-2"></div>
+                <div className="w-3/4 h-[2px] bg-[#4ec9b0] ml-2"></div>
+                <div className="w-1/2 h-[2px] bg-[#9cdcfe] ml-4"></div>
+                <div className="w-1/2 h-[2px] bg-[#9cdcfe] ml-4"></div>
+                <div className="w-1/2 h-[2px] bg-[#9cdcfe] ml-4"></div>
+                <div className="w-3/4 h-[2px] bg-[#4ec9b0] ml-4"></div>
+                <div className="w-full h-[2px] bg-[#ce9178] ml-6"></div>
+                <div className="w-3/4 h-[2px] bg-[#4ec9b0] ml-4"></div>
+                <div className="w-3/4 h-[2px] bg-[#4ec9b0] ml-2"></div>
+                <div className="w-full h-[2px] bg-[#569cd6]"></div>
               </div>
+            </div>
+          </div>
+          
+          {/* Status Bar */}
+          <div className="h-6 bg-[#007acc] flex items-center justify-between px-3 text-white text-xs select-none">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-1 cursor-pointer hover:bg-white/20 px-1 rounded">
+                <GitBranch size={12} />
+                <span>main*</span>
+              </div>
+              <div className="flex items-center gap-1 cursor-pointer hover:bg-white/20 px-1 rounded">
+                <X size={12} />
+                <span>0</span>
+                <span className="ml-1">⚠</span>
+                <span>0</span>
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <span className="hidden md:inline cursor-pointer hover:bg-white/20 px-1 rounded">Ln 1, Col 1</span>
+              <span className="hidden md:inline cursor-pointer hover:bg-white/20 px-1 rounded">Spaces: 2</span>
+              <span className="hidden md:inline cursor-pointer hover:bg-white/20 px-1 rounded">UTF-8</span>
+              <span className="hidden md:inline cursor-pointer hover:bg-white/20 px-1 rounded">CRLF</span>
+              <span className="cursor-pointer hover:bg-white/20 px-1 rounded">TypeScript React</span>
             </div>
           </div>
         </div>
