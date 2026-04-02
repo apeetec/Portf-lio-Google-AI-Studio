@@ -38,7 +38,18 @@ const TechnologiesSection = ({ skills, sectionTitle }: TechnologiesSectionProps)
 
     // baseZ = -(i+1)*Z_GAP → card i reaches z=0 at progress (i+1)/N
     // (tunnel starts empty; first card arrives after ~1/N of total scroll)
-    const totalZ = skills.length * Z_GAP;
+    const totalZ   = skills.length * Z_GAP;
+    const loopSize = skills.length * Z_GAP; // infinite-loop wrapping size
+    const CAM_SPEED = 2.5;
+
+    // Spiral x/y positions — computed once, identical to reference
+    const cardData = skills.map((_, i) => {
+      const angle = (i / skills.length) * Math.PI * 6;
+      const x     = Math.cos(angle) * (window.innerWidth  * 0.3);
+      const y     = Math.sin(angle) * (window.innerHeight * 0.3);
+      const rot   = (((i * 137) % 60) - 30); // deterministic, no Math.random
+      return { x, y, rot, baseZ: -i * Z_GAP };
+    });
 
     let scrollY  = window.scrollY;
     let velocity = 0;
@@ -95,9 +106,8 @@ const TechnologiesSection = ({ skills, sectionTitle }: TechnologiesSectionProps)
       const fadeOut = Math.min(1, (spacer.offsetHeight - relScroll) / 300);
       viewport.style.opacity = String(Math.max(0, Math.min(fadeIn, fadeOut)));
 
-      // Camera Z — linear scroll → Z space
-      const progress = Math.max(0, Math.min(1, relScroll / spacer.offsetHeight));
-      const cameraZ  = progress * totalZ;
+      // Camera Z — unbounded, matches reference CAM_SPEED approach
+      const cameraZ = relScroll * CAM_SPEED;
 
       // Camera tilt — mouse/touch + velocity lean
       const tiltX = mouseY * 5 - velocity * 0.3;
@@ -108,40 +118,37 @@ const TechnologiesSection = ({ skills, sectionTitle }: TechnologiesSectionProps)
       const fov = Math.max(400, 1000 - Math.abs(velocity) * 10);
       viewport.style.perspective = `${fov}px`;
 
-      // Cards — tight window keeps one card visible at a time
-      // baseZ = -(i+1)*Z_GAP; fade range 500 each side; with Z_GAP=1000
-      // card i+1 enters exactly when card i exits → no overlap / no "repeats"
+      // Cards — reference: spiral x/y, infinite modulo loop, float/bob
       cardRefs.current.forEach((card, i) => {
         if (!card) return;
 
-        const itemZ = -(i + 1) * Z_GAP + cameraZ;
+        const { x, y, rot, baseZ } = cardData[i];
 
-        if (itemZ > -600 && itemZ < 600) {
-          let opacity = 0;
-          let scale   = 0.5;
+        // Infinite loop wrapping (exact reference formula)
+        let vizZ = ((baseZ + cameraZ) % loopSize + loopSize) % loopSize;
+        if (vizZ > 500) vizZ -= loopSize;
 
-          if (itemZ <= 0) {
-            const ratio = Math.max(0, 1 - Math.abs(itemZ) / 500);
-            opacity = ratio;
-            scale   = 0.5 + ratio * 0.5;
-          } else {
-            const ratio = Math.max(0, 1 - itemZ / 500);
-            opacity = ratio;
-            scale   = 1 + (1 - ratio) * 0.5;
-          }
+        // Reference opacity curve
+        let alpha = 1;
+        if      (vizZ < -3000) alpha = 0;
+        else if (vizZ < -2000) alpha = (vizZ + 3000) / 1000;
+        if      (vizZ >   100) alpha = Math.max(0, 1 - (vizZ - 100) / 400);
 
-          card.style.opacity   = String(opacity);
-          card.style.transform = `translate3d(-50%, -50%, ${itemZ}px) scale(${scale})`;
-          if (card.style.display !== "flex") card.style.display = "flex";
+        card.style.opacity = String(Math.max(0, alpha));
 
+        if (alpha > 0) {
+          // Float / bob per card
+          const float = Math.sin(time * 0.001 + x * 0.01) * 8;
           // Chromatic aberration on fast scroll
           const shift = velocity * 1.5;
           card.style.filter =
             Math.abs(velocity) > 2
               ? `drop-shadow(${shift}px 0 0 rgba(255,0,60,.5)) drop-shadow(${-shift}px 0 0 rgba(0,243,255,.5))`
               : "none";
-
-          card.style.pointerEvents = itemZ > -80 && itemZ < 80 ? "auto" : "none";
+          // Spiral x/y offset from viewport center + Z depth
+          card.style.transform = `translate3d(${x}px, ${y}px, ${vizZ}px) rotateZ(${rot}deg) rotateY(${float}deg)`;
+          if (card.style.display !== "flex") card.style.display = "flex";
+          card.style.pointerEvents = vizZ > -100 && vizZ < 100 ? "auto" : "none";
         } else {
           if (card.style.display !== "none") card.style.display = "none";
         }
@@ -225,8 +232,10 @@ const TechnologiesSection = ({ skills, sectionTitle }: TechnologiesSectionProps)
                 position:        "absolute",
                 top:             "50%",
                 left:            "50%",
-                width:           "min(380px, 88vw)",
+                width:           "380px",
                 height:          "450px",
+                marginLeft:      "-190px",   // center: half of 380px
+                marginTop:       "-225px",   // center: half of 450px
                 opacity:         0,
                 display:         "none",
                 transformOrigin: "center center",
