@@ -36,10 +36,6 @@ const TechnologiesSection = ({ skills, sectionTitle }: TechnologiesSectionProps)
     const world    = worldRef.current;
     if (!spacer || !viewport || !world) return;
 
-    // baseZ = -(i+1)*Z_GAP → card i reaches z=0 at progress (i+1)/N
-    // (tunnel starts empty; first card arrives after ~1/N of total scroll)
-    const totalZ   = skills.length * Z_GAP;
-    const loopSize = skills.length * Z_GAP; // infinite-loop wrapping size
     const CAM_SPEED = 2.5;
 
     // Spiral x/y positions — computed once, identical to reference
@@ -124,9 +120,8 @@ const TechnologiesSection = ({ skills, sectionTitle }: TechnologiesSectionProps)
 
         const { x, y, rot, baseZ } = cardData[i];
 
-        // Infinite loop wrapping (exact reference formula)
-        let vizZ = ((baseZ + cameraZ) % loopSize + loopSize) % loopSize;
-        if (vizZ > 500) vizZ -= loopSize;
+        // Linear — each card appears once, no repetition
+        const vizZ = baseZ + cameraZ;
 
         // Reference opacity curve
         let alpha = 1;
