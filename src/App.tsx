@@ -221,7 +221,7 @@ const SectionHeader = ({ number, title }: { number: string; title: string }) => 
   );
 };
 
-const ContactForm = () => {
+const ContactForm = ({ lang, t }: { lang: 'pt' | 'en', t: any }) => {
   const [submitted, setSubmitted] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -233,8 +233,8 @@ const ContactForm = () => {
   if (submitted) {
     return (
       <div className="h-full flex flex-col items-center justify-center border border-gray-800 p-12 text-center bg-black/20 backdrop-blur-sm">
-        <h3 className="font-display text-3xl mb-4 text-[#E8175D]">THANK YOU</h3>
-        <p className="font-mono text-xs text-gray-400">Your message has been received. I'll get back to you soon.</p>
+        <h3 className="font-display text-3xl mb-4 text-[#E8175D] uppercase">{t[lang].contact.form.thanks}</h3>
+        <p className="font-mono text-xs text-gray-400 uppercase">{t[lang].contact.form.success}</p>
       </div>
     );
   }
@@ -242,19 +242,19 @@ const ContactForm = () => {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-6 bg-black/20 backdrop-blur-sm p-8 border border-gray-800/50">
       <div className="flex flex-col gap-2">
-        <label className="font-mono text-[10px] text-gray-500 uppercase">Name</label>
+        <label className="font-mono text-[10px] text-gray-500 uppercase">{t[lang].contact.form.name}</label>
         <input required type="text" className="bg-transparent border-b border-gray-800 pb-2 text-white font-mono text-sm focus:outline-none focus:border-[#E8175D] transition-colors" />
       </div>
       <div className="flex flex-col gap-2">
-        <label className="font-mono text-[10px] text-gray-500 uppercase">Email</label>
+        <label className="font-mono text-[10px] text-gray-500 uppercase">{t[lang].contact.form.email}</label>
         <input required type="email" className="bg-transparent border-b border-gray-800 pb-2 text-white font-mono text-sm focus:outline-none focus:border-[#E8175D] transition-colors" />
       </div>
       <div className="flex flex-col gap-2">
-        <label className="font-mono text-[10px] text-gray-500 uppercase">Message</label>
+        <label className="font-mono text-[10px] text-gray-500 uppercase">{t[lang].contact.form.message}</label>
         <textarea required rows={4} className="bg-transparent border-b border-gray-800 pb-2 text-white font-mono text-sm focus:outline-none focus:border-[#E8175D] transition-colors resize-none" />
       </div>
       <button type="submit" className="mt-4 w-full py-6 border border-white font-display text-xl uppercase hover:bg-[#E8175D] hover:border-[#E8175D] hover:text-white transition-all duration-300">
-        Send Message
+        {t[lang].contact.form.send}
       </button>
     </form>
   );
@@ -423,12 +423,12 @@ const TechBackground = () => (
   </div>
 );
 
-const EducationSection = () => {
+const EducationSection = ({ lang, t }: { lang: 'pt' | 'en', t: any }) => {
   return (
     <section id="education" className="relative z-10 py-32 px-8 md:px-12">
       <TechBackground />
       <div className="max-w-7xl w-full mx-auto relative z-10">
-        <SectionHeader number="04" title="ACADEMIC BACKGROUND" />
+        <SectionHeader number="04" title={t[lang].sections.education} />
         
         {/* Editor Window */}
         <div className="mt-12 rounded-lg overflow-hidden border border-[#333333] bg-[#1e1e1e] shadow-2xl flex flex-col relative font-sans">
@@ -535,33 +535,33 @@ const EducationSection = () => {
                   
                   {/* Item 1 */}
                   <div className="ml-4"><span className="text-[#808080]">&lt;</span><span className="text-[#4ec9b0]">Degree</span></div>
-                  <div className="ml-8"><span className="text-[#9cdcfe]">title</span><span className="text-[#d4d4d4]">=</span><span className="text-[#ce9178]">"Systems Analysis and Development"</span></div>
-                  <div className="ml-8"><span className="text-[#9cdcfe]">period</span><span className="text-[#d4d4d4]">=</span><span className="text-[#ce9178]">"2022 - 2024"</span></div>
-                  <div className="ml-8"><span className="text-[#9cdcfe]">institution</span><span className="text-[#d4d4d4]">=</span><span className="text-[#ce9178]">"Universidade Anhembi Morumbi"</span><span className="text-[#808080]">&gt;</span></div>
+                  <div className="ml-8"><span className="text-[#9cdcfe]">title</span><span className="text-[#d4d4d4]">=</span><span className="text-[#ce9178]">"{t[lang].education.degree1.title}"</span></div>
+                  <div className="ml-8"><span className="text-[#9cdcfe]">period</span><span className="text-[#d4d4d4]">=</span><span className="text-[#ce9178]">"{t[lang].education.degree1.period}"</span></div>
+                  <div className="ml-8"><span className="text-[#9cdcfe]">institution</span><span className="text-[#d4d4d4]">=</span><span className="text-[#ce9178]">"{t[lang].education.degree1.inst}"</span><span className="text-[#808080]">&gt;</span></div>
                   <div className="ml-8"><span className="text-[#808080]">&lt;</span><span className="text-[#4ec9b0]">Skills</span><span className="text-[#808080]">&gt;</span></div>
-                  <div className="ml-12 text-[#ce9178]">Advanced web development, information security, software modeling</div>
+                  <div className="ml-12 text-[#ce9178] whitespace-normal max-w-xl">{t[lang].education.degree1.skills}</div>
                   <div className="ml-8"><span className="text-[#808080]">&lt;/</span><span className="text-[#4ec9b0]">Skills</span><span className="text-[#808080]">&gt;</span></div>
                   <div className="ml-4"><span className="text-[#808080]">&lt;/</span><span className="text-[#4ec9b0]">Degree</span><span className="text-[#808080]">&gt;</span></div>
                   <div></div>
 
                   {/* Item 2 */}
                   <div className="ml-4"><span className="text-[#808080]">&lt;</span><span className="text-[#4ec9b0]">Degree</span></div>
-                  <div className="ml-8"><span className="text-[#9cdcfe]">title</span><span className="text-[#d4d4d4]">=</span><span className="text-[#ce9178]">"Internet Informatics (Technician)"</span></div>
-                  <div className="ml-8"><span className="text-[#9cdcfe]">period</span><span className="text-[#d4d4d4]">=</span><span className="text-[#ce9178]">"2020 - 2021"</span></div>
-                  <div className="ml-8"><span className="text-[#9cdcfe]">institution</span><span className="text-[#d4d4d4]">=</span><span className="text-[#ce9178]">"ETEC Centro Paula Souza"</span><span className="text-[#808080]">&gt;</span></div>
+                  <div className="ml-8"><span className="text-[#9cdcfe]">title</span><span className="text-[#d4d4d4]">=</span><span className="text-[#ce9178]">"{t[lang].education.degree2.title}"</span></div>
+                  <div className="ml-8"><span className="text-[#9cdcfe]">period</span><span className="text-[#d4d4d4]">=</span><span className="text-[#ce9178]">"{t[lang].education.degree2.period}"</span></div>
+                  <div className="ml-8"><span className="text-[#9cdcfe]">institution</span><span className="text-[#d4d4d4]">=</span><span className="text-[#ce9178]">"{t[lang].education.degree2.inst}"</span><span className="text-[#808080]">&gt;</span></div>
                   <div className="ml-8"><span className="text-[#808080]">&lt;</span><span className="text-[#4ec9b0]">Skills</span><span className="text-[#808080]">&gt;</span></div>
-                  <div className="ml-12 text-[#ce9178]">Programming, databases, systems integration, front-end/back-end</div>
+                  <div className="ml-12 text-[#ce9178] whitespace-normal max-w-xl">{t[lang].education.degree2.skills}</div>
                   <div className="ml-8"><span className="text-[#808080]">&lt;/</span><span className="text-[#4ec9b0]">Skills</span><span className="text-[#808080]">&gt;</span></div>
                   <div className="ml-4"><span className="text-[#808080]">&lt;/</span><span className="text-[#4ec9b0]">Degree</span><span className="text-[#808080]">&gt;</span></div>
                   <div></div>
 
                   {/* Item 3 */}
                   <div className="ml-4"><span className="text-[#808080]">&lt;</span><span className="text-[#4ec9b0]">Degree</span></div>
-                  <div className="ml-8"><span className="text-[#9cdcfe]">title</span><span className="text-[#d4d4d4]">=</span><span className="text-[#ce9178]">"Mechatronics"</span></div>
-                  <div className="ml-8"><span className="text-[#9cdcfe]">period</span><span className="text-[#d4d4d4]">=</span><span className="text-[#ce9178]">"2013 - 2015"</span></div>
-                  <div className="ml-8"><span className="text-[#9cdcfe]">institution</span><span className="text-[#d4d4d4]">=</span><span className="text-[#ce9178]">"Senai Roberto Mange"</span><span className="text-[#808080]">&gt;</span></div>
+                  <div className="ml-8"><span className="text-[#9cdcfe]">title</span><span className="text-[#d4d4d4]">=</span><span className="text-[#ce9178]">"{t[lang].education.degree3.title}"</span></div>
+                  <div className="ml-8"><span className="text-[#9cdcfe]">period</span><span className="text-[#d4d4d4]">=</span><span className="text-[#ce9178]">"{t[lang].education.degree3.period}"</span></div>
+                  <div className="ml-8"><span className="text-[#9cdcfe]">institution</span><span className="text-[#d4d4d4]">=</span><span className="text-[#ce9178]">"{t[lang].education.degree3.inst}"</span><span className="text-[#808080]">&gt;</span></div>
                   <div className="ml-8"><span className="text-[#808080]">&lt;</span><span className="text-[#4ec9b0]">Description</span><span className="text-[#808080]">&gt;</span></div>
-                  <div className="ml-12 text-[#ce9178] whitespace-normal max-w-2xl">Implementation, maintenance, and development of automated systems and equipment, focusing on technical standards, quality, workplace safety, and sustainability.</div>
+                  <div className="ml-12 text-[#ce9178] whitespace-normal max-w-2xl">{t[lang].education.degree3.desc}</div>
                   <div className="ml-8"><span className="text-[#808080]">&lt;/</span><span className="text-[#4ec9b0]">Description</span><span className="text-[#808080]">&gt;</span></div>
                   <div className="ml-4"><span className="text-[#808080]">&lt;/</span><span className="text-[#4ec9b0]">Degree</span><span className="text-[#808080]">&gt;</span></div>
 
@@ -642,6 +642,68 @@ export default function App() {
   const techContainerRef = useRef<HTMLDivElement>(null);
 
   const [activeSection, setActiveSection] = useState("home");
+  const [lang, setLang] = useState<"pt" | "en">("pt");
+
+  const t = {
+    pt: {
+      nav: { home: "INÍCIO", projects: "PROJETOS", experience: "EXPERIÊNCIA", education: "FORMAÇÃO", technologies: "TECNOLOGIAS", contact: "CONTATO" },
+      hero: {
+        title1: "Desenvolvedor Web",
+        title2: "FullStack",
+        subtitle: "Gabriel / Desenvolvedor Web FullStack",
+        tagline: "// SOLUÇÕES WEB ESCALÁVEIS.",
+        explore: "Explore meu trabalho",
+        description: "Desenvolvedor Web Fullstack com mais de 4 anos de experiência em desenvolvimento de aplicações escaláveis, APIs RESTful e integrações com sistemas ERP. Expertise em PHP, Laravel, JavaScript, React.js e Vue.js, com sólida atuação em ambientes ágeis (Scrum/Kanban). Histórico comprovado de melhoria de performance — redução de 60% no tempo de carregamento de páginas e 40% no tempo de emissão de documentos fiscais via automação. Experiência com Docker, CI/CD, Redis e desenvolvimento de soluções de Business Intelligence."
+      },
+      sections: {
+        projects: "PROJETOS SELECIONADOS",
+        experience: "CARREIRA & EXPERIÊNCIA",
+        education: "FORMAÇÃO ACADÊMICA",
+        technologies: "TECNOLOGIAS",
+        contact: "ENTRE EM CONTATO"
+      },
+      contact: {
+        title: "Vamos construir algo <span class='text-[#E8175D]'>extraordinário</span> juntos.",
+        status: "Disponível para freelance & colaborações",
+        form: { name: "Nome", email: "E-mail", message: "Mensagem", send: "Enviar", thanks: "OBRIGADO", success: "Sua mensagem foi recebida. Entrarei em contato em breve." }
+      },
+      education: {
+        title: "Formação Acadêmica",
+        degree1: { title: "Análise e Desenvolvimento de Sistemas", period: "2022 – 2024", inst: "Universidade Anhembi Morumbi", skills: "Desenvolvimento web avançado, segurança da informação, modelagem de software" },
+        degree2: { title: "Informática para Internet (Técnico)", period: "2020 – 2021", inst: "ETEC Centro Paula Souza", skills: "Programação, banco de dados, integração de sistemas, front-end/back-end" },
+        degree3: { title: "Mecatrônica", period: "2013 – 2015", inst: "Senai Roberto Mange", desc: "Formação voltada à implementação, manutenção e desenvolvimento de sistemas e equipamentos automatizados, com foco em normas técnicas, qualidade, segurança do trabalho e sustentabilidade." }
+      }
+    },
+    en: {
+      nav: { home: "HOME", projects: "PROJECTS", experience: "EXPERIENCE", education: "EDUCATION", technologies: "TECHNOLOGIES", contact: "CONTACT" },
+      hero: {
+        title1: "Web Developer",
+        title2: "FullStack",
+        subtitle: "Gabriel / Web Developer FullStack",
+        tagline: "// SCALABLE WEB SOLUTIONS.",
+        explore: "Explore my work",
+        description: "Fullstack Web Developer with over 4 years of experience in developing scalable applications, RESTful APIs, and ERP system integrations. Expertise in PHP, Laravel, JavaScript, React.js, and Vue.js, with solid performance in agile environments (Scrum/Kanban). Proven track record of performance improvement — 60% reduction in page load time and 40% in tax document issuance via automation. Experience with Docker, CI/CD, Redis, and Business Intelligence solutions development."
+      },
+      sections: {
+        projects: "SELECTED PROJECTS",
+        experience: "CAREER & EXPERIENCE",
+        education: "ACADEMIC BACKGROUND",
+        technologies: "TECHNOLOGIES",
+        contact: "GET IN TOUCH"
+      },
+      contact: {
+        title: "Let's build something <span class='text-[#E8175D]'>extraordinary</span> together.",
+        status: "Available for freelance & collaborations",
+        form: { name: "Name", email: "Email", message: "Message", send: "Send", thanks: "THANK YOU", success: "Your message has been received. I'll get back to you soon." }
+      },
+      education: {
+        title: "Academic Background",
+        degree1: { title: "Systems Analysis and Development", period: "2022 - 2024", inst: "Anhembi Morumbi University", skills: "Advanced web development, information security, software modeling" },
+        degree2: { title: "Internet Informatics (Technician)", period: "2020 - 2021", inst: "ETEC Centro Paula Souza", skills: "Programming, databases, systems integration, front-end/back-end" },
+        degree3: { title: "Mechatronics", period: "2013 - 2015", inst: "Senai Roberto Mange", desc: "Training focused on the implementation, maintenance, and development of automated systems and equipment, with a focus on technical standards, quality, workplace safety, and sustainability." }
+      }
+    }
+  };
 
   useGSAP(() => {
     // Initialize Lenis
@@ -867,37 +929,80 @@ export default function App() {
   }, { scope: container });
 
   const navItems = [
-    { id: "01", label: "HOME", href: "#home" },
-    { id: "02", label: "PROJECTS", href: "#projects" },
-    { id: "03", label: "EXPERIENCE", href: "#experience" },
-    { id: "04", label: "EDUCATION", href: "#education" },
-    { id: "05", label: "TECHNOLOGIES", href: "#skills" },
-    { id: "06", label: "CONTACT", href: "#contact" },
+    { id: "01", label: t[lang].nav.home, href: "#home" },
+    { id: "02", label: t[lang].nav.projects, href: "#projects" },
+    { id: "03", label: t[lang].nav.experience, href: "#experience" },
+    { id: "04", label: t[lang].nav.education, href: "#education" },
+    { id: "05", label: t[lang].nav.technologies, href: "#skills" },
+    { id: "06", label: t[lang].nav.contact, href: "#contact" },
   ];
 
-  const experiences = [
+  const experiences = lang === 'pt' ? [
     {
-      role: "SENIOR FRONTEND ENGINEER",
-      company: "TECH CORP",
-      year: "2022 - PRESENT",
-      description: "Leading the frontend architecture for high-traffic web applications. Implementing complex UI/UX designs with React and GSAP, improving performance by 40%."
+      role: "WEB DEVELOPER FULLSTACK",
+      company: "HOSPITAL MATERNIDADE DE CAMPINAS",
+      year: "DEZ 2025 – PRESENTE",
+      description: "Desenvolvi painéis de BI com WeKnow para análise de dados hospitalares (+5 departamentos). Otimizei queries SQL no banco MV. Criei aplicações React.js para processos administrativos e integrações via APIs RESTful. Refatorei sistemas legados e gerenciei versionamento com GitLab."
     },
     {
-      role: "FULLSTACK DEVELOPER",
-      company: "DIGITAL AGENCY",
-      year: "2019 - 2022",
-      description: "Developed scalable e-commerce solutions and interactive marketing sites. Managed database architecture and API integrations."
+      role: "WEB DEVELOPER FULLSTACK",
+      company: "AGROSS INSUMOS AGRÍCOLAS",
+      year: "JUL 2025 – DEZ 2025",
+      description: "Desenvolvimento Vue.js 3 em ciclos ágeis. Implementei sistema de recompensas, APIs REST para sistemas internos e administrei containers Docker. Integrei APIs de IA para automação de processos."
     },
     {
-      role: "JUNIOR DEVELOPER",
-      company: "STARTUP INC",
-      year: "2018 - 2019",
-      description: "Assisted in building internal tools and maintaining legacy systems. Gained strong foundational skills in JavaScript and PHP."
+      role: "WEB DEVELOPER FULLSTACK",
+      company: "VITABE",
+      year: "FEV 2025 – ABR 2025",
+      description: "Automatizei processos com PHP/Laravel (redução de 40% no tempo de NF). Integrei Uappi e Vindi via APIs. Desenvolvi interfaces Vue.js e iniciei integração com Shopify API."
+    },
+    {
+      role: "WEB DEVELOPER FULLSTACK",
+      company: "C4 PUBLICIDADE",
+      year: "2021 – 2024",
+      description: "Desenvolvi +20 sites com PHP/JS. Otimizei performance front-end (redução de 60% no carregamento). Automatizei tarefas com PHP/jQuery e colaborei em UX/Acessibilidade."
+    },
+    {
+      role: "SUPORTE TÉCNICO E DESENV. WEB",
+      company: "LUMINOSOS CAMPINAS",
+      year: "2019 – 2021",
+      description: "Manutenção de ERP em Visual Basic/SQL. Desenvolvi novo site institucional e realizei suporte de infraestrutura."
+    }
+  ] : [
+    {
+      role: "FULLSTACK WEB DEVELOPER",
+      company: "HOSPITAL MATERNIDADE DE CAMPINAS",
+      year: "DEC 2025 – PRESENT",
+      description: "Developed BI dashboards with WeKnow for hospital data analysis (+5 departments). Optimized SQL queries in MV database. Created React.js apps for administrative processes and RESTful API integrations. Refactored legacy systems and managed versioning with GitLab."
+    },
+    {
+      role: "FULLSTACK WEB DEVELOPER",
+      company: "AGROSS INSUMOS AGRÍCOLAS",
+      year: "JUL 2025 – DEC 2025",
+      description: "Vue.js 3 development in agile cycles. Implemented rewards system, REST APIs for internal systems, and managed Docker containers. Integrated AI APIs for process automation."
+    },
+    {
+      role: "FULLSTACK WEB DEVELOPER",
+      company: "VITABE",
+      year: "FEB 2025 – APR 2025",
+      description: "Automated processes with PHP/Laravel (40% reduction in invoice time). Integrated Uappi and Vindi via APIs. Developed Vue.js interfaces and started Shopify API integration."
+    },
+    {
+      role: "FULLSTACK WEB DEVELOPER",
+      company: "C4 PUBLICIDADE",
+      year: "2021 – 2024",
+      description: "Developed +20 sites with PHP/JS. Optimized front-end performance (60% reduction in load time). Automated tasks with PHP/jQuery and collaborated on UX/Accessibility."
+    },
+    {
+      role: "TECH SUPPORT & WEB DEV",
+      company: "LUMINOSOS CAMPINAS",
+      year: "2019 – 2021",
+      description: "ERP maintenance in Visual Basic/SQL. Developed new institutional website and provided infrastructure support."
     }
   ];
 
   const skills = [
-    "PHP", "HTML", "CSS", "JAVASCRIPT", "SQL", "PYTHON", "C#", "REACT"
+    "PHP", "Laravel", "JavaScript", "React.js", "Vue.js", "Docker", "CI/CD", "Redis", "SQL", "Git", "HTML5", "CSS3", "jQuery", "Visual Basic", "WeKnow", "MV", "Shopify API"
   ];
 
   const projects = [
@@ -935,7 +1040,7 @@ export default function App() {
       {/* Navigation */}
       <nav className="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-8 py-6 md:px-12 bg-gradient-to-b from-[#0a0a0a] to-transparent">
         <div className="text-xl font-black tracking-tighter">GABRIELDEV</div>
-        <div className="hidden md:flex gap-8">
+        <div className="hidden md:flex gap-8 items-center">
           {navItems.map((item) => (
             <a
               key={item.id}
@@ -948,7 +1053,20 @@ export default function App() {
               <span>/{item.label}</span>
             </a>
           ))}
+          <button 
+            onClick={() => setLang(lang === 'pt' ? 'en' : 'pt')}
+            className="ml-4 px-2 py-1 border border-gray-700 font-mono text-[10px] tracking-widest hover:border-[#E8175D] hover:text-[#E8175D] transition-all rounded uppercase"
+          >
+            {lang === 'pt' ? 'EN' : 'PT'}
+          </button>
         </div>
+        {/* Mobile Language Toggle */}
+        <button 
+          onClick={() => setLang(lang === 'pt' ? 'en' : 'pt')}
+          className="md:hidden px-2 py-1 border border-gray-700 font-mono text-[10px] tracking-widest hover:border-[#E8175D] hover:text-[#E8175D] transition-all rounded uppercase"
+        >
+          {lang === 'pt' ? 'EN' : 'PT'}
+        </button>
       </nav>
 
       {/* Hero Section */}
@@ -958,17 +1076,17 @@ export default function App() {
         <div className="max-w-7xl w-full mx-auto relative z-10">
           <div className="relative mb-12">
             <h1 className="hero-text text-[11vw] md:text-[9vw] font-black leading-[0.85] tracking-tighter uppercase">
-              Web Developer
+              {t[lang].hero.title1}
             </h1>
             <div className="flex items-start gap-4 md:gap-8">
               <div className="hero-line w-[1px] bg-gray-700 self-stretch mt-4" />
               <h1 className="hero-text text-[11vw] md:text-[9vw] font-black leading-[0.85] tracking-tighter uppercase text-[#E8175D]">
-                FullStack
+                {t[lang].hero.title2}
               </h1>
             </div>
             <div className="absolute right-0 bottom-0 text-right">
               <p className="hero-text font-mono text-[10px] tracking-widest text-gray-400">
-                Gabriel / Web Developer FullStack
+                {t[lang].hero.subtitle}
               </p>
             </div>
           </div>
@@ -977,10 +1095,10 @@ export default function App() {
             <div className="space-y-12">
               <div className="h-[1px] w-full bg-gray-800" />
               <div className="font-mono text-[11px] tracking-[0.2em] text-gray-400">
-                // SCALABLE WEB SOLUTIONS.
+                {t[lang].hero.tagline}
               </div>
               <a href="#projects" className="group flex items-center gap-2 font-mono text-[10px] tracking-widest uppercase hover:text-[#E8175D] transition-colors">
-                Explore my work
+                {t[lang].hero.explore}
                 <span className="inline-block transform group-hover:translate-y-1 transition-transform">
                   ↓
                 </span>
@@ -988,9 +1106,7 @@ export default function App() {
             </div>
             <div className="flex flex-col items-end text-right">
               <p className="max-w-md font-mono text-[11px] leading-relaxed text-gray-500 uppercase tracking-tight">
-                Full-stack developer and hacker driven by a passion for building
-                efficient, secure applications. Expertise in web development, with a
-                focus on performance and security, pushing boundaries in code.
+                {t[lang].hero.description}
               </p>
             </div>
           </div>
@@ -1000,7 +1116,7 @@ export default function App() {
       {/* Projects Section */}
       <section id="projects" className="relative z-10 py-32 px-8 md:px-12">
         <div className="max-w-7xl w-full mx-auto">
-          <SectionHeader number="02" title="SELECTED PROJECTS" />
+          <SectionHeader number="02" title={t[lang].sections.projects} />
           
           <div className="flex flex-col">
             {projects.map((project, index) => (
@@ -1064,7 +1180,7 @@ export default function App() {
         <div className="absolute bottom-20 right-20 text-gray-700 font-mono text-xs">+</div>
 
         <div className="max-w-7xl w-full mx-auto relative z-10">
-          <SectionHeader number="03" title="CAREER & EXPERIENCE" />
+          <SectionHeader number="03" title={t[lang].sections.experience} />
           
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 relative mt-16">
             
@@ -1099,7 +1215,7 @@ export default function App() {
         </div>
       </section>
 
-      <EducationSection />
+      <EducationSection lang={lang} t={t} />
 
       {/* Technologies Section */}
       <section 
@@ -1109,7 +1225,7 @@ export default function App() {
         style={{ perspective: '1000px' }}
       >
         <div className="absolute top-20 left-0 right-0 px-8 md:px-12 z-20 w-full max-w-7xl mx-auto">
-          <SectionHeader number="05" title="TECHNOLOGIES" />
+          <SectionHeader number="05" title={t[lang].sections.technologies} />
         </div>
 
         {/* Post Processing Overlays */}
@@ -1191,25 +1307,26 @@ export default function App() {
       {/* Contact Section */}
       <section id="contact" className="relative z-10 py-32 px-8 md:px-12">
         <div className="max-w-7xl w-full mx-auto">
-          <SectionHeader number="06" title="GET IN TOUCH" />
+          <SectionHeader number="06" title={t[lang].sections.contact} />
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-24">
             <div className="space-y-8">
-              <p className="font-display text-5xl md:text-7xl leading-[0.9] tracking-tighter uppercase">
-                Let's build something <span className="text-[#E8175D]">extraordinary</span> together.
-              </p>
+              <p 
+                className="font-display text-5xl md:text-7xl leading-[0.9] tracking-tighter uppercase"
+                dangerouslySetInnerHTML={{ __html: t[lang].contact.title }}
+              />
               <div className="flex flex-col gap-4">
                 <a href="mailto:gabriel938@gmail.com" className="font-mono text-xl md:text-2xl hover:text-[#E8175D] transition-colors underline underline-offset-8 decoration-gray-800 hover:decoration-[#E8175D]">
                   gabriel938@gmail.com
                 </a>
                 <p className="font-mono text-xs text-gray-500 uppercase tracking-widest">
-                  Available for freelance & collaborations
+                  {t[lang].contact.status}
                 </p>
               </div>
             </div>
             
             <div className="flex flex-col justify-end gap-12">
-              <ContactForm />
+              <ContactForm lang={lang} t={t} />
             </div>
           </div>
         </div>
