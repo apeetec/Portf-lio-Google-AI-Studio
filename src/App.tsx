@@ -262,6 +262,7 @@ export default function App() {
       <CustomCursor />
       <SocialBar />
       <div className="wavy-overlay fixed inset-0 z-0 pointer-events-none" />
+      <div className="noise-overlay" />
 
       {/* Top navigation */}
       <Navbar items={navItems} activeSection={activeSection} lang={lang} setLang={setLang} />

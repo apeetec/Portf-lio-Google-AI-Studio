@@ -72,15 +72,15 @@ const ParticleWave = () => {
       const mouseInfluenceY = currentMouseY * 150 * scrollFactor;
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = "rgba(255, 255, 255, 0.3)";
+      ctx.fillStyle = "rgba(255, 255, 255, 0.65)";
 
       // Origin at 85% across the canvas for dramatic depth perspective
       const cx = canvas.width  * 0.85 + mouseInfluenceX;
       const cy = canvas.height * 0.5  + mouseInfluenceY;
 
-      const numRings    = 20;
-      const ringSpacing = 18;
-      const dotSpacing  = 18;
+      const numRings    = 26;
+      const ringSpacing = 16;
+      const dotSpacing  = 15;
 
       // Pre-compute tilt values once per frame
       const tilt    = Math.PI / 3.5;
@@ -109,7 +109,7 @@ const ParticleWave = () => {
 
           // Viewport culling — skip particles outside visible area
           if (px > canvas.width * 0.3 && px < canvas.width && py > 0 && py < canvas.height) {
-            ctx.rect(px, py, 1.2 * scale, 1.2 * scale);
+            ctx.rect(px, py, 2.0 * scale, 2.0 * scale);
           }
         }
       }
