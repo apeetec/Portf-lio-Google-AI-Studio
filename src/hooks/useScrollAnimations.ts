@@ -223,7 +223,7 @@ export function useScrollAnimations({
       });
 
       // ── 9. Scroll Spy — Active Section Tracking ───────────────────────────
-      const SECTIONS = ["home", "projects", "experience", "skills", "contact"];
+      const SECTIONS = ["home", "projects", "experience", "education", "skills", "contact"];
 
       SECTIONS.forEach((section) => {
         ScrollTrigger.create({
