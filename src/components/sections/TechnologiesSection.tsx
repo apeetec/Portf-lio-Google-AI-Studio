@@ -28,7 +28,11 @@ const TechnologiesSection = ({ skills, sectionTitle }: TechnologiesSectionProps)
   const cardRefs    = useRef<(HTMLDivElement | null)[]>([]);
   const rafIdRef    = useRef<number>(0);
 
-  const Z_GAP = 1000;
+  const Z_GAP     = 1000;
+  const CAM_SPEED  = 2.5;
+
+  // Scroll distance needed for all N cards to pass through + 300px fade margins each side
+  const spacerHeight = Math.ceil(((skills.length - 1) * Z_GAP + 800) / CAM_SPEED) + 600;
 
   useEffect(() => {
     const spacer   = spacerRef.current;
@@ -36,7 +40,7 @@ const TechnologiesSection = ({ skills, sectionTitle }: TechnologiesSectionProps)
     const world    = worldRef.current;
     if (!spacer || !viewport || !world) return;
 
-    const CAM_SPEED = 2.5;
+    // CAM_SPEED defined at component scope
 
     // Spiral x/y positions — computed once, identical to reference
     const cardData = skills.map((_, i) => {
@@ -169,7 +173,7 @@ const TechnologiesSection = ({ skills, sectionTitle }: TechnologiesSectionProps)
       <div
         id="skills"
         ref={spacerRef}
-        style={{ height: `${skills.length * 100}vh` }}
+        style={{ height: `${spacerHeight}px` }}
         className="relative bg-[#030303] px-8 md:px-12 pt-24"
       >
         <SectionHeader number="05" title={sectionTitle} />
