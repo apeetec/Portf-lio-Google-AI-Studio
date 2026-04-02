@@ -43,8 +43,6 @@ export default function App() {
   // ── Refs passed to GSAP animations ──────────────────────────────────────
   const container      = useRef<HTMLDivElement>(null);
   const experienceRef  = useRef<HTMLDivElement>(null);
-  const techSectionRef = useRef<HTMLDivElement>(null);
-  const techContainerRef = useRef<HTMLDivElement>(null);
 
   // ── Scroll-spy state — updated by useScrollAnimations ───────────────────
   const [activeSection, setActiveSection] = useState("home");
@@ -248,8 +246,6 @@ export default function App() {
   useScrollAnimations({
     container,
     experienceRef,
-    techSectionRef,
-    techContainerRef,
     setActiveSection,
   });
 
@@ -272,7 +268,7 @@ export default function App() {
       <ProjectsSection     projects={PROJECTS}    sectionTitle={t[lang].sections.projects} />
       <ExperienceSection   experiences={experiences} sectionTitle={t[lang].sections.experience} sectionRef={experienceRef} />
       <EducationSection    lang={lang} t={t} />
-      <TechnologiesSection skills={SKILLS} sectionTitle={t[lang].sections.technologies} sectionRef={techSectionRef} containerRef={techContainerRef} />
+      <TechnologiesSection skills={SKILLS} sectionTitle={t[lang].sections.technologies} />
       <ContactSection      lang={lang} t={t} />
       <Footer />
     </div>

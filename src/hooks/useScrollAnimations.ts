@@ -6,13 +6,9 @@ import Lenis from "lenis";
 
 interface UseScrollAnimationsParams {
   /** GSAP scope container — all selectors are scoped to this element. */
-  container:       MutableRefObject<HTMLDivElement | null>;
+  container:        MutableRefObject<HTMLDivElement | null>;
   /** Ref to the Experience section — used for the mouse-tracking light effect. */
-  experienceRef:   MutableRefObject<HTMLDivElement | null>;
-  /** Ref to the Technologies outer section — used for ScrollTrigger pinning. */
-  techSectionRef:  MutableRefObject<HTMLDivElement | null>;
-  /** Ref to the Technologies 3D container — holds all `.tech-card` elements. */
-  techContainerRef: MutableRefObject<HTMLDivElement | null>;
+  experienceRef:    MutableRefObject<HTMLDivElement | null>;
   /** Callback to update the active nav item (scroll-spy). */
   setActiveSection: (section: string) => void;
 }
@@ -26,12 +22,13 @@ interface UseScrollAnimationsParams {
  * 2. Experience section radial light that follows the mouse (cached rect
  *    to avoid forced reflow on every mousemove).
  * 3. Hero section entrance animations (.hero-text, .hero-line, social icons).
- * 4. Technologies 3D tunnel scroll (card Z positioning via quickSetters).
- * 5. Background text parallax in the Technologies section.
- * 6. Section header scroll-reveal (`.section-header`).
- * 7. Project row batch scroll-reveal (`.project-item`).
- * 8. Experience card batch scroll-reveal (`.experience-card-wrapper`).
- * 9. Scroll-spy: updates `activeSection` as each section enters the viewport.
+ * 4. Section header scroll-reveal (`.section-header`).
+ * 5. Project row batch scroll-reveal (`.project-item`).
+ * 6. Experience card batch scroll-reveal (`.experience-card-wrapper`).
+ * 7. Scroll-spy: updates `activeSection` as each section enters the viewport.
+ *
+ * Note: the Technologies 3D tunnel is self-contained in TechnologiesSection.tsx
+ * (RAF loop + position:fixed viewport — no GSAP pin, no sticky, iOS-safe).
  *
  * All animations are scoped to `container` via `useGSAP({ scope: container })`
  * and cleaned up automatically on unmount.
@@ -39,8 +36,6 @@ interface UseScrollAnimationsParams {
 export function useScrollAnimations({
   container,
   experienceRef,
-  techSectionRef,
-  techContainerRef,
   setActiveSection,
 }: UseScrollAnimationsParams): void {
 
@@ -111,120 +106,7 @@ export function useScrollAnimations({
         x: -20, opacity: 0, duration: 0.5, stagger: 0.1, delay: 1, ease: "power2.out",
       });
 
-      // ── 4. Technologies — 3D Tunnel Scroll (desktop) / Batch Reveal (mobile) ─
-      if (techSectionRef.current && techContainerRef.current) {
-        if (isTouchDevice) {
-          // ── Mobile path ─────────────────────────────────────────────────────
-          // Skip pin, skip Z-axis init.
-          // WebKit iOS: position:sticky (GSAP pin) + preserve-3d = black layer.
-          // Cards are in flex-col flow layout on mobile, so just batch-reveal them.
-          ScrollTrigger.batch(".tech-card", {
-            start:   "top 88%",
-            onEnter: (elements) => {
-              gsap.from(elements, {
-                opacity: 0, y: 40, scale: 0.95,
-                duration: 0.6, stagger: 0.08, ease: "power2.out",
-              });
-            },
-            once: true,
-          });
-        } else {
-          // ── Desktop path — full 3D tunnel ─────────────────────────────────
-          const cards  = gsap.utils.toArray<HTMLElement>(".tech-card");
-          const zGap   = 1000;
-          const totalZ = cards.length * zGap;
-
-          // Pre-build quickSetters once — avoids per-frame GSAP property lookup
-          const setters = cards.map((card) => ({
-            z:             gsap.quickSetter(card, "z",             "px"),
-            opacity:       gsap.quickSetter(card, "opacity"),
-            scale:         gsap.quickSetter(card, "scale"),
-            display:       gsap.quickSetter(card, "display"),
-            pointerEvents: gsap.quickSetter(card, "pointerEvents"),
-          }));
-
-          // Start all cards far away and hidden
-          cards.forEach((_, i) => {
-            setters[i].z(-i * zGap);
-            setters[i].opacity(0);
-            setters[i].scale(0.5);
-            setters[i].display("none");
-          });
-
-          ScrollTrigger.create({
-            trigger: techSectionRef.current,
-            start:   "top top",
-            end:     `+=${cards.length * 80}%`,
-            pin:     true,
-            scrub:   0.5,
-            onUpdate: (self) => {
-              const currentZ = self.progress * totalZ;
-
-              cards.forEach((card, i) => {
-                const itemZ = -i * zGap + currentZ;
-
-                if (itemZ > -2000 && itemZ < 1000) {
-                  let opacity = 0;
-                  let scale   = 0.5;
-
-                  if (itemZ <= 0) {
-                    // Approaching from far — fade + scale up
-                    const ratio = Math.max(0, 1 - Math.abs(itemZ) / 1500);
-                    opacity = ratio;
-                    scale   = 0.5 + ratio * 0.5;
-                  } else {
-                    // Passing the camera — fade out + scale past 1
-                    const ratio = Math.max(0, 1 - itemZ / 800);
-                    opacity = ratio;
-                    scale   = 1 + (1 - ratio) * 0.5;
-                  }
-
-                  setters[i].z(itemZ);
-                  setters[i].opacity(opacity);
-                  setters[i].scale(scale);
-
-                  if (card.style.display !== "flex") setters[i].display("flex");
-
-                  // Only allow pointer interaction when card is near the camera
-                  const isInteractive = itemZ > -100 && itemZ < 100;
-                  if (card.style.pointerEvents !== (isInteractive ? "auto" : "none")) {
-                    setters[i].pointerEvents(isInteractive ? "auto" : "none");
-                  }
-                } else {
-                  // Out of view range — hide to reduce GPU load
-                  if (card.style.display !== "none") setters[i].display("none");
-                }
-              });
-
-              // Update HUD velocity readout
-              const velReadout = document.getElementById("vel-readout");
-              if (velReadout) velReadout.innerText = (self.getVelocity() / 100).toFixed(2);
-            },
-          });
-
-          // ── 5. Technologies — Background Text Parallax (desktop only) ──────
-          const bgText = document.querySelector(".tech-bg-text") as HTMLElement;
-          if (bgText) {
-            const ySetter       = gsap.quickSetter(bgText, "y",       "px");
-            const scaleSetter   = gsap.quickSetter(bgText, "scale");
-            const opacitySetter = gsap.quickSetter(bgText, "opacity");
-
-            ScrollTrigger.create({
-              trigger:  techSectionRef.current,
-              start:    "top bottom",
-              end:      "bottom top",
-              onUpdate: (self) => {
-                const p = self.progress;
-                ySetter(-100 * p);
-                scaleSetter(1 + 0.2 * p);
-                opacitySetter(0.05 * (1 - p));
-              },
-            });
-          }
-        }
-      }
-
-      // ── 6. Section Headers — Scroll Reveal ────────────────────────────────
+      // ── 4. Section Headers — Scroll Reveal ────────────────────────────────
       gsap.utils.toArray(".section-header").forEach((header: any) => {
         gsap.from(header, {
           scrollTrigger: { trigger: header, start: "top 85%" },
