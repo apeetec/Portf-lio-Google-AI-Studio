@@ -32,12 +32,21 @@ interface TechnologiesSectionProps {
  * `transformStyle: "preserve-3d"` on the container are required for the
  * 3D effect to work.
  */
-const TechnologiesSection = ({ skills, sectionTitle, sectionRef, containerRef }: TechnologiesSectionProps) => (
+const TechnologiesSection = ({ skills, sectionTitle, sectionRef, containerRef }: TechnologiesSectionProps) => {
+  // perspective + preserve-3d are only needed for the desktop 3D tunnel.
+  // On iOS (touch) applying perspective to a section that later gets
+  // preserve-3d children can still trigger a WebKit GPU compositing bug
+  // that renders the compositor layer as solid black.
+  const isTouchDevice =
+    typeof window !== "undefined" &&
+    ("ontouchstart" in window || navigator.maxTouchPoints > 0);
+
+  return (
   <section
     id="skills"
     ref={sectionRef}
-    className="relative z-10 bg-[#030303] overflow-hidden min-h-screen flex flex-col justify-center"
-    style={{ perspective: "1000px" }}
+    className="relative z-10 bg-[#030303] min-h-screen flex flex-col justify-center"
+    style={isTouchDevice ? undefined : { perspective: "1000px" }}
   >
     {/* Section title — positioned absolutely so it stays visible during pin */}
     <div className="absolute top-20 left-8 md:left-12 z-20 w-full max-w-7xl mx-auto">
@@ -55,16 +64,21 @@ const TechnologiesSection = ({ skills, sectionTitle, sectionRef, containerRef }:
       </h2>
     </div>
 
-    {/* 3D world container — preserve-3d required for Z axis positioning */}
+    {/* 3D world container
+        - Mobile: flex-col scrollable list (no preserve-3d, no absolute positioning)
+        - Desktop: preserve-3d with absolute cards for the GSAP Z-axis tunnel
+        overflow-hidden is intentionally ABSENT on both section and container:
+        WebKit iOS bug — overflow:hidden on an ancestor flattens preserve-3d children
+        into a black composited texture. */}
     <div
       ref={containerRef}
-      className="relative w-full h-screen flex items-center justify-center z-10"
-      style={{ transformStyle: "preserve-3d" }}
+      className="relative w-full flex flex-col items-center gap-8 py-24 px-4 md:h-screen md:flex-row md:items-center md:justify-center md:py-0 md:px-0 z-10"
+      style={isTouchDevice ? undefined : { transformStyle: "preserve-3d" }}
     >
       {skills.map((skill, index) => (
         <div
           key={index}
-          className="tech-card absolute flex flex-col justify-between w-[300px] md:w-[380px] h-[450px] bg-[#0a0a0a]/40 backdrop-blur-md border border-white/10 p-8 md:p-10 group hover:border-[#E8175D]"
+          className="tech-card flex-shrink-0 flex flex-col justify-between w-full max-w-sm md:w-[380px] md:absolute md:h-[450px] bg-[#0a0a0a]/40 backdrop-blur-md border border-white/10 p-8 md:p-10 group hover:border-[#E8175D]"
           style={{ transformOrigin: "center center" }}
         >
           {/* Corner accent marks */}
@@ -126,6 +140,7 @@ const TechnologiesSection = ({ skills, sectionTitle, sectionRef, containerRef }:
       </div>
     </div>
   </section>
-);
+  );
+};
 
 export default TechnologiesSection;

@@ -111,98 +111,116 @@ export function useScrollAnimations({
         x: -20, opacity: 0, duration: 0.5, stagger: 0.1, delay: 1, ease: "power2.out",
       });
 
-      // ── 4. Technologies — 3D Tunnel Scroll ────────────────────────────────
+      // ── 4. Technologies — 3D Tunnel Scroll (desktop) / Batch Reveal (mobile) ─
       if (techSectionRef.current && techContainerRef.current) {
-        const cards  = gsap.utils.toArray<HTMLElement>(".tech-card");
-        const zGap   = 1000;
-        const totalZ = cards.length * zGap;
+        if (isTouchDevice) {
+          // ── Mobile path ─────────────────────────────────────────────────────
+          // Skip pin, skip Z-axis init.
+          // WebKit iOS: position:sticky (GSAP pin) + preserve-3d = black layer.
+          // Cards are in flex-col flow layout on mobile, so just batch-reveal them.
+          ScrollTrigger.batch(".tech-card", {
+            start:   "top 88%",
+            onEnter: (elements) => {
+              gsap.from(elements, {
+                opacity: 0, y: 40, scale: 0.95,
+                duration: 0.6, stagger: 0.08, ease: "power2.out",
+              });
+            },
+            once: true,
+          });
+        } else {
+          // ── Desktop path — full 3D tunnel ─────────────────────────────────
+          const cards  = gsap.utils.toArray<HTMLElement>(".tech-card");
+          const zGap   = 1000;
+          const totalZ = cards.length * zGap;
 
-        // Pre-build quickSetters once — avoids per-frame GSAP property lookup
-        const setters = cards.map((card) => ({
-          z:             gsap.quickSetter(card, "z",             "px"),
-          opacity:       gsap.quickSetter(card, "opacity"),
-          scale:         gsap.quickSetter(card, "scale"),
-          display:       gsap.quickSetter(card, "display"),
-          pointerEvents: gsap.quickSetter(card, "pointerEvents"),
-        }));
+          // Pre-build quickSetters once — avoids per-frame GSAP property lookup
+          const setters = cards.map((card) => ({
+            z:             gsap.quickSetter(card, "z",             "px"),
+            opacity:       gsap.quickSetter(card, "opacity"),
+            scale:         gsap.quickSetter(card, "scale"),
+            display:       gsap.quickSetter(card, "display"),
+            pointerEvents: gsap.quickSetter(card, "pointerEvents"),
+          }));
 
-        // Start all cards far away and hidden
-        cards.forEach((_, i) => {
-          setters[i].z(-i * zGap);
-          setters[i].opacity(0);
-          setters[i].scale(0.5);
-          setters[i].display("none");
-        });
-
-        ScrollTrigger.create({
-          trigger: techSectionRef.current,
-          start:   "top top",
-          end:     `+=${cards.length * 80}%`,
-          pin:     true,
-          scrub:   0.5,
-          onUpdate: (self) => {
-            const currentZ = self.progress * totalZ;
-
-            cards.forEach((card, i) => {
-              const itemZ = -i * zGap + currentZ;
-
-              if (itemZ > -2000 && itemZ < 1000) {
-                let opacity = 0;
-                let scale   = 0.5;
-
-                if (itemZ <= 0) {
-                  // Approaching from far — fade + scale up
-                  const ratio = Math.max(0, 1 - Math.abs(itemZ) / 1500);
-                  opacity = ratio;
-                  scale   = 0.5 + ratio * 0.5;
-                } else {
-                  // Passing the camera — fade out + scale past 1
-                  const ratio = Math.max(0, 1 - itemZ / 800);
-                  opacity = ratio;
-                  scale   = 1 + (1 - ratio) * 0.5;
-                }
-
-                setters[i].z(itemZ);
-                setters[i].opacity(opacity);
-                setters[i].scale(scale);
-
-                if (card.style.display !== "flex") setters[i].display("flex");
-
-                // Only allow pointer interaction when card is near the camera
-                const isInteractive = itemZ > -100 && itemZ < 100;
-                if (card.style.pointerEvents !== (isInteractive ? "auto" : "none")) {
-                  setters[i].pointerEvents(isInteractive ? "auto" : "none");
-                }
-              } else {
-                // Out of view range — hide to reduce GPU load
-                if (card.style.display !== "none") setters[i].display("none");
-              }
-            });
-
-            // Update HUD velocity readout
-            const velReadout = document.getElementById("vel-readout");
-            if (velReadout) velReadout.innerText = (self.getVelocity() / 100).toFixed(2);
-          },
-        });
-
-        // ── 5. Technologies — Background Text Parallax ──────────────────────
-        const bgText = document.querySelector(".tech-bg-text") as HTMLElement;
-        if (bgText) {
-          const ySetter       = gsap.quickSetter(bgText, "y",       "px");
-          const scaleSetter   = gsap.quickSetter(bgText, "scale");
-          const opacitySetter = gsap.quickSetter(bgText, "opacity");
+          // Start all cards far away and hidden
+          cards.forEach((_, i) => {
+            setters[i].z(-i * zGap);
+            setters[i].opacity(0);
+            setters[i].scale(0.5);
+            setters[i].display("none");
+          });
 
           ScrollTrigger.create({
-            trigger:  techSectionRef.current,
-            start:    "top bottom",
-            end:      "bottom top",
+            trigger: techSectionRef.current,
+            start:   "top top",
+            end:     `+=${cards.length * 80}%`,
+            pin:     true,
+            scrub:   0.5,
             onUpdate: (self) => {
-              const p = self.progress;
-              ySetter(-100 * p);
-              scaleSetter(1 + 0.2 * p);
-              opacitySetter(0.05 * (1 - p));
+              const currentZ = self.progress * totalZ;
+
+              cards.forEach((card, i) => {
+                const itemZ = -i * zGap + currentZ;
+
+                if (itemZ > -2000 && itemZ < 1000) {
+                  let opacity = 0;
+                  let scale   = 0.5;
+
+                  if (itemZ <= 0) {
+                    // Approaching from far — fade + scale up
+                    const ratio = Math.max(0, 1 - Math.abs(itemZ) / 1500);
+                    opacity = ratio;
+                    scale   = 0.5 + ratio * 0.5;
+                  } else {
+                    // Passing the camera — fade out + scale past 1
+                    const ratio = Math.max(0, 1 - itemZ / 800);
+                    opacity = ratio;
+                    scale   = 1 + (1 - ratio) * 0.5;
+                  }
+
+                  setters[i].z(itemZ);
+                  setters[i].opacity(opacity);
+                  setters[i].scale(scale);
+
+                  if (card.style.display !== "flex") setters[i].display("flex");
+
+                  // Only allow pointer interaction when card is near the camera
+                  const isInteractive = itemZ > -100 && itemZ < 100;
+                  if (card.style.pointerEvents !== (isInteractive ? "auto" : "none")) {
+                    setters[i].pointerEvents(isInteractive ? "auto" : "none");
+                  }
+                } else {
+                  // Out of view range — hide to reduce GPU load
+                  if (card.style.display !== "none") setters[i].display("none");
+                }
+              });
+
+              // Update HUD velocity readout
+              const velReadout = document.getElementById("vel-readout");
+              if (velReadout) velReadout.innerText = (self.getVelocity() / 100).toFixed(2);
             },
           });
+
+          // ── 5. Technologies — Background Text Parallax (desktop only) ──────
+          const bgText = document.querySelector(".tech-bg-text") as HTMLElement;
+          if (bgText) {
+            const ySetter       = gsap.quickSetter(bgText, "y",       "px");
+            const scaleSetter   = gsap.quickSetter(bgText, "scale");
+            const opacitySetter = gsap.quickSetter(bgText, "opacity");
+
+            ScrollTrigger.create({
+              trigger:  techSectionRef.current,
+              start:    "top bottom",
+              end:      "bottom top",
+              onUpdate: (self) => {
+                const p = self.progress;
+                ySetter(-100 * p);
+                scaleSetter(1 + 0.2 * p);
+                opacitySetter(0.05 * (1 - p));
+              },
+            });
+          }
         }
       }
 
