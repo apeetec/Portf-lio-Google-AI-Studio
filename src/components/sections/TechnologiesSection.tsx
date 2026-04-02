@@ -3,6 +3,7 @@ import SectionHeader from "../ui/SectionHeader";
 
 interface TechnologiesSectionProps {
   skills: string[];
+  sectionTitle: string;
   /**
    * Ref to the outer <section> — used by GSAP ScrollTrigger for scroll
    * pinning and the background text parallax in `useScrollAnimations`.
@@ -31,7 +32,7 @@ interface TechnologiesSectionProps {
  * `transformStyle: "preserve-3d"` on the container are required for the
  * 3D effect to work.
  */
-const TechnologiesSection = ({ skills, sectionRef, containerRef }: TechnologiesSectionProps) => (
+const TechnologiesSection = ({ skills, sectionTitle, sectionRef, containerRef }: TechnologiesSectionProps) => (
   <section
     id="skills"
     ref={sectionRef}
@@ -40,7 +41,7 @@ const TechnologiesSection = ({ skills, sectionRef, containerRef }: TechnologiesS
   >
     {/* Section title — positioned absolutely so it stays visible during pin */}
     <div className="absolute top-20 left-8 md:left-12 z-20 w-full max-w-7xl mx-auto">
-      <SectionHeader number="04" title="TECHNOLOGIES" />
+      <SectionHeader number="05" title={sectionTitle} />
     </div>
 
     {/* CRT post-processing overlays (CSS-only, defined in index.css) */}

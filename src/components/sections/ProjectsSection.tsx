@@ -4,6 +4,7 @@ import type { Project } from "../../types";
 
 interface ProjectsSectionProps {
   projects: Project[];
+  sectionTitle: string;
 }
 
 /**
@@ -18,10 +19,10 @@ interface ProjectsSectionProps {
  * GSAP target: `.project-item` — batch scroll-reveal managed by
  * `useScrollAnimations`.
  */
-const ProjectsSection = ({ projects }: ProjectsSectionProps) => (
+const ProjectsSection = ({ projects, sectionTitle }: ProjectsSectionProps) => (
   <section id="projects" className="relative z-10 py-32 px-8 md:px-12">
     <div className="max-w-7xl w-full mx-auto">
-      <SectionHeader number="02" title="SELECTED PROJECTS" />
+      <SectionHeader number="02" title={sectionTitle} />
 
       <div className="flex flex-col">
         {projects.map((project, index) => (

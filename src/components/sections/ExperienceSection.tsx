@@ -5,6 +5,7 @@ import type { Experience } from "../../types";
 
 interface ExperienceSectionProps {
   experiences: Experience[];
+  sectionTitle: string;
   /**
    * Ref to the outer <section> element.
    * Required by `useScrollAnimations` to cache the bounding rect for the
@@ -29,7 +30,7 @@ interface ExperienceSectionProps {
  * GSAP target: `.experience-card-wrapper` — batch scroll-reveal in
  * `useScrollAnimations`.
  */
-const ExperienceSection = ({ experiences, sectionRef }: ExperienceSectionProps) => (
+const ExperienceSection = ({ experiences, sectionTitle, sectionRef }: ExperienceSectionProps) => (
   <section
     id="experience"
     ref={sectionRef}
@@ -55,7 +56,7 @@ const ExperienceSection = ({ experiences, sectionRef }: ExperienceSectionProps) 
     <div className="absolute bottom-20 right-20 text-gray-700 font-mono text-xs">+</div>
 
     <div className="max-w-7xl w-full mx-auto relative z-10">
-      <SectionHeader number="03" title="CAREER & EXPERIENCE" />
+      <SectionHeader number="03" title={sectionTitle} />
 
       {/* 12-column branching grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 relative mt-16">

@@ -1,16 +1,20 @@
 import React, { useState } from "react";
 
-/**
- * Contact form with a client-side submitted confirmation state.
- *
- * On successful submit the form is replaced with a "Thank You" message
- * for 5 seconds, then resets automatically.
- *
- * Note: form submission is currently front-end only — wire up a backend
- * endpoint or service (e.g. Resend, Formspree) in `handleSubmit` to
- * actually deliver messages.
- */
-const ContactForm = () => {
+interface FormTranslations {
+  contact: {
+    form: {
+      name: string; email: string; message: string;
+      send: string; thanks: string; success: string;
+    };
+  };
+}
+
+interface ContactFormProps {
+  lang: "pt" | "en";
+  t: { pt: FormTranslations; en: FormTranslations };
+}
+
+const ContactForm = ({ lang, t }: ContactFormProps) => {
   const [submitted, setSubmitted] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -24,9 +28,9 @@ const ContactForm = () => {
   if (submitted) {
     return (
       <div className="h-full flex flex-col items-center justify-center border border-gray-800 p-12 text-center bg-black/20 backdrop-blur-sm">
-        <h3 className="font-display text-3xl mb-4 text-[#E8175D]">THANK YOU</h3>
+        <h3 className="font-display text-3xl mb-4 text-[#E8175D]">{t[lang].contact.form.thanks}</h3>
         <p className="font-mono text-xs text-gray-400">
-          Your message has been received. I'll get back to you soon.
+          {t[lang].contact.form.success}
         </p>
       </div>
     );
@@ -39,7 +43,7 @@ const ContactForm = () => {
       className="flex flex-col gap-6 bg-black/20 backdrop-blur-sm p-8 border border-gray-800/50"
     >
       <div className="flex flex-col gap-2">
-        <label className="font-mono text-[10px] text-gray-500 uppercase">Name</label>
+        <label className="font-mono text-[10px] text-gray-500 uppercase">{t[lang].contact.form.name}</label>
         <input
           required
           type="text"
@@ -48,7 +52,7 @@ const ContactForm = () => {
       </div>
 
       <div className="flex flex-col gap-2">
-        <label className="font-mono text-[10px] text-gray-500 uppercase">Email</label>
+        <label className="font-mono text-[10px] text-gray-500 uppercase">{t[lang].contact.form.email}</label>
         <input
           required
           type="email"
@@ -57,7 +61,7 @@ const ContactForm = () => {
       </div>
 
       <div className="flex flex-col gap-2">
-        <label className="font-mono text-[10px] text-gray-500 uppercase">Message</label>
+        <label className="font-mono text-[10px] text-gray-500 uppercase">{t[lang].contact.form.message}</label>
         <textarea
           required
           rows={4}
@@ -69,7 +73,7 @@ const ContactForm = () => {
         type="submit"
         className="mt-4 w-full py-6 border border-white font-display text-xl uppercase hover:bg-[#E8175D] hover:border-[#E8175D] hover:text-white transition-all duration-300"
       >
-        Send Message
+        {t[lang].contact.form.send}
       </button>
     </form>
   );

@@ -68,5 +68,7 @@ export const EXPERIENCES: Experience[] = [
 // ── Technology Stack ──────────────────────────────────────────────────────────
 
 export const SKILLS: string[] = [
-  "PHP", "HTML", "CSS", "JAVASCRIPT", "SQL", "PYTHON", "C#", "REACT",
+  "PHP", "Laravel", "JavaScript", "React.js", "Vue.js", "Docker",
+  "CI/CD", "Redis", "SQL", "Git", "HTML5", "CSS3", "jQuery",
+  "Visual Basic", "WeKnow", "MV", "Shopify API",
 ];
