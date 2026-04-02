@@ -9,8 +9,16 @@ import gsap from "gsap";
  *   interactive elements (links, buttons, inputs, card groups).
  * - Uses event delegation (one listener on document.body) instead of
  *   attaching handlers to every interactive element.
+ * - Returns null on touch/mobile devices: mix-blend-mode on a fixed element
+ *   causes a black screen bug on iOS Safari and Chrome iOS.
  */
 const CustomCursor = () => {
+  // Touch devices have no cursor — skip rendering entirely.
+  // mix-blend-mode: difference on a fixed element causes black screen on mobile.
+  const isTouchDevice =
+    typeof window !== "undefined" &&
+    ("ontouchstart" in window || navigator.maxTouchPoints > 0);
+  if (isTouchDevice) return null;
   const cursorRef  = useRef<HTMLDivElement>(null);
   const [isHovering, setIsHovering] = useState(false);
 

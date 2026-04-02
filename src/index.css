@@ -21,11 +21,16 @@ body {
   font-family: var(--font-sans);
   margin: 0;
   overflow-x: hidden;
-  cursor: none;
 }
 
-a, button, input, textarea, select, [role="button"] {
-  cursor: none !important;
+/* Hide native cursor only on devices that have a precise pointer (mouse/trackpad) */
+@media (hover: hover) and (pointer: fine) {
+  body {
+    cursor: none;
+  }
+  a, button, input, textarea, select, [role="button"] {
+    cursor: none !important;
+  }
 }
 
 ::selection {
