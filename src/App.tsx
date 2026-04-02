@@ -272,7 +272,7 @@ export default function App() {
       <ProjectsSection     projects={PROJECTS}    sectionTitle={t[lang].sections.projects} />
       <ExperienceSection   experiences={experiences} sectionTitle={t[lang].sections.experience} sectionRef={experienceRef} />
       <EducationSection    lang={lang} t={t} />
-      <TechnologiesSection skills={SKILLS} sectionTitle={t[lang].sections.technologies} sectionRef={techSectionRef} containerRef={techContainerRef} />
+      {/* <TechnologiesSection skills={SKILLS} sectionTitle={t[lang].sections.technologies} sectionRef={techSectionRef} containerRef={techContainerRef} /> */}
       <ContactSection      lang={lang} t={t} />
       <Footer />
     </div>
