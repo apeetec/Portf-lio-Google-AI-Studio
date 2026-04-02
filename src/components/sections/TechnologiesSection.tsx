@@ -9,21 +9,20 @@ interface TechnologiesSectionProps {
 /**
  * Technologies section — 3D tunnel scroll effect.
  *
- * Architecture (matches the reference implementation):
- * - A tall scroll spacer (`id="skills"`, height = skills.length × 100vh) provides
- *   the scroll distance and anchors the scroll-spy.
- * - A `position: fixed` viewport div is shown only while the spacer is in the
- *   scroll range. It holds the 3D world and never participates in overflow stacking,
- *   so WebKit iOS never composites it to a black texture.
- * - A `requestAnimationFrame` loop (no GSAP pin / no sticky) reads `window.scrollY`
- *   each frame and computes `cameraZ = relativeScroll × CAM_SPEED`.
- * - Each card's transform is set via `element.style.transform = translate3d(x,y,z)`
- *   directly — the same technique as the reference jQuery code.
+ * Architecture (iOS-safe):
+ * - Scroll spacer (`id="skills"`) provides scroll distance and anchors
+ *   the scroll-spy. Height = skills.length × 100vh.
+ * - `position: fixed` viewport — isolated compositor layer, no sticky,
+ *   no overflow-hidden ancestor → no WebKit iOS black-screen bug.
+ * - RAF loop reads window.scrollY each frame; maps progress linearly to
+ *   cameraZ — mirrors the original GSAP scrub behaviour without pin/sticky.
+ * - Each card flies through the centre Z-axis one at a time (no x/y spiral),
+ *   matching the original visual exactly.
  *
- * Why this avoids the iOS black screen:
- * - No `position: sticky` (GSAP `pin: true`) + `perspective` + `preserve-3d` combo.
- * - No `overflow-hidden` ancestor above a `preserve-3d` subtree.
- * - Cards are always in the DOM; the RAF controls visibility via opacity.
+ * Extras vs original GSAP version:
+ * - Camera tilt: world rotates slightly with mouse/touch position + velocity
+ * - Dynamic FOV: perspective narrows on fast scroll for speed-warp illusion
+ * - Chromatic aberration: card drop-shadow shifts on fast scroll
  */
 const TechnologiesSection = ({ skills, sectionTitle }: TechnologiesSectionProps) => {
   const spacerRef   = useRef<HTMLDivElement>(null);
@@ -32,8 +31,8 @@ const TechnologiesSection = ({ skills, sectionTitle }: TechnologiesSectionProps)
   const cardRefs    = useRef<(HTMLDivElement | null)[]>([]);
   const rafIdRef    = useRef<number>(0);
 
-  const Z_GAP    = 800;
-  const CAM_SPEED = 2.5;
+  // Match the original GSAP z-gap exactly
+  const Z_GAP = 1000;
 
   useEffect(() => {
     const spacer   = spacerRef.current;
@@ -41,16 +40,7 @@ const TechnologiesSection = ({ skills, sectionTitle }: TechnologiesSectionProps)
     const world    = worldRef.current;
     if (!spacer || !viewport || !world) return;
 
-    const loopSize = skills.length * Z_GAP;
-
-    // ── Card spiral positions — computed once on mount ──────────────────────
-    const cardData = skills.map((_, i) => {
-      const angle = (i / skills.length) * Math.PI * 6;
-      const x     = Math.cos(angle) * (window.innerWidth  * 0.28);
-      const y     = Math.sin(angle) * (window.innerHeight * 0.28);
-      const rot   = (((i * 137) % 60) - 30); // deterministic spread, no Math.random
-      return { x, y, rot, baseZ: -i * Z_GAP };
-    });
+    const totalZ = skills.length * Z_GAP;
 
     // ── State ───────────────────────────────────────────────────────────────
     let scrollY  = window.scrollY;
@@ -59,12 +49,12 @@ const TechnologiesSection = ({ skills, sectionTitle }: TechnologiesSectionProps)
     let mouseY   = 0;
     let lastTime = performance.now();
 
-    // Absolute top of the spacer — recomputed on resize
+    // Cache spacer top — recomputed on resize
     let spacerTop = window.scrollY + spacer.getBoundingClientRect().top;
     const onResize = () => {
       spacerTop = window.scrollY + spacer.getBoundingClientRect().top;
     };
-    window.addEventListener("resize", onResize, { passive: true });
+    window.addEventListener("resize",    onResize,    { passive: true });
 
     const onMouseMove = (e: MouseEvent) => {
       mouseX = (e.clientX / window.innerWidth  - 0.5) * 2;
@@ -82,10 +72,10 @@ const TechnologiesSection = ({ skills, sectionTitle }: TechnologiesSectionProps)
     const raf = (time: number) => {
       rafIdRef.current = requestAnimationFrame(raf);
 
-      const delta = time - lastTime;
-      lastTime    = time;
+      const delta   = time - lastTime;
+      lastTime       = time;
 
-      // Velocity — computed from per-frame scroll delta and smoothed
+      // Velocity — per-frame scroll delta, smoothed
       const newScrollY  = window.scrollY;
       const rawVelocity = newScrollY - scrollY;
       velocity  += (rawVelocity - velocity) * 0.15;
@@ -97,54 +87,64 @@ const TechnologiesSection = ({ skills, sectionTitle }: TechnologiesSectionProps)
       if (velEl) velEl.innerText = Math.abs(velocity).toFixed(2);
       if (fpsEl && delta > 0) fpsEl.innerText = String(Math.round(1000 / delta));
 
-      // Show fixed viewport only while the spacer's scroll range is active
+      // Show fixed viewport only while spacer is on screen
       const spacerBottom = spacerTop + spacer.offsetHeight;
       const inRange      = scrollY >= spacerTop && scrollY < spacerBottom;
       viewport.style.visibility = inRange ? "visible" : "hidden";
       if (!inRange) return;
 
-      // Virtual camera Z-position relative to section start
-      const cameraZ = (scrollY - spacerTop) * CAM_SPEED;
+      // cameraZ: linear map of scroll progress → same behaviour as original GSAP scrub
+      const progress = Math.max(0, Math.min(1, (scrollY - spacerTop) / spacer.offsetHeight));
+      const cameraZ  = progress * totalZ;
 
-      // Camera tilt — mouse parallax + velocity lean
+      // Camera tilt — mouse/touch parallax + velocity lean (new)
       const tiltX = mouseY * 5 - velocity * 0.3;
       const tiltY = mouseX * 5;
       world.style.transform = `rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
 
-      // Dynamic FOV warp — narrows perspective on fast scroll (speed illusion)
+      // Dynamic FOV — narrows perspective on fast scroll for speed-warp (new)
       const fov = Math.max(400, 1000 - Math.abs(velocity) * 10);
       viewport.style.perspective = `${fov}px`;
 
-      // ── Cards ─────────────────────────────────────────────────────────────
+      // ── Cards — identical Z/opacity/scale curve to original GSAP version ──
       cardRefs.current.forEach((card, i) => {
         if (!card) return;
-        const { x, y, rot, baseZ } = cardData[i];
 
-        // Infinite loop wrapping (same modulo formula as reference)
-        let vizZ = ((baseZ + cameraZ) % loopSize + loopSize) % loopSize;
-        if (vizZ > 500) vizZ -= loopSize;
+        const itemZ = -i * Z_GAP + cameraZ;
 
-        // Opacity curve — fade in from far, fade out past camera
-        let alpha = 1;
-        if      (vizZ < -3000) alpha = 0;
-        else if (vizZ < -2000) alpha = (vizZ + 3000) / 1000;
-        if      (vizZ >   100) alpha = Math.max(0, 1 - (vizZ - 100) / 400);
+        if (itemZ > -2000 && itemZ < 1000) {
+          let opacity = 0;
+          let scale   = 0.5;
 
-        card.style.opacity = String(Math.max(0, alpha));
+          if (itemZ <= 0) {
+            // Approaching from far — fade + scale up
+            const ratio = Math.max(0, 1 - Math.abs(itemZ) / 1500);
+            opacity = ratio;
+            scale   = 0.5 + ratio * 0.5;
+          } else {
+            // Past the camera — fade out + scale overshoot
+            const ratio = Math.max(0, 1 - itemZ / 800);
+            opacity = ratio;
+            scale   = 1 + (1 - ratio) * 0.5;
+          }
 
-        if (alpha > 0) {
-          // Subtle float (bobbing) per card, offset by x position
-          const float = Math.sin(time * 0.001 + x * 0.01) * 8;
+          card.style.opacity = String(opacity);
+          // translate3d(-50%,-50%) centres the absolutely-positioned card;
+          // scale drives the original approach/recede illusion
+          card.style.transform = `translate3d(-50%, -50%, ${itemZ}px) scale(${scale})`;
+          if (card.style.display !== "flex") card.style.display = "flex";
 
-          // Chromatic aberration simulation via drop-shadow on fast scroll
+          // Chromatic aberration — drop-shadow colour split on fast scroll (new)
           const shift = velocity * 1.5;
           card.style.filter =
             Math.abs(velocity) > 2
               ? `drop-shadow(${shift}px 0 0 rgba(255,0,60,.5)) drop-shadow(${-shift}px 0 0 rgba(0,243,255,.5))`
               : "none";
 
-          card.style.transform =
-            `translate3d(${x}px, ${y}px, ${vizZ}px) rotateZ(${rot}deg) rotateY(${float}deg)`;
+          // Pointer events only when card is near camera
+          card.style.pointerEvents = itemZ > -100 && itemZ < 100 ? "auto" : "none";
+        } else {
+          if (card.style.display !== "none") card.style.display = "none";
         }
       });
     };
@@ -162,19 +162,19 @@ const TechnologiesSection = ({ skills, sectionTitle }: TechnologiesSectionProps)
   return (
     <>
       {/* ── Scroll spacer ───────────────────────────────────────────────────
-          Provides the scroll distance for the tunnel and anchors the scroll-spy.
-          Height = one full viewport per skill card. */}
+          Provides scroll distance (one full viewport per card) and anchors
+          the scroll-spy. The section background colour fills the page flow. */}
       <div
         id="skills"
         ref={spacerRef}
         style={{ height: `${skills.length * 100}vh` }}
-        className="relative bg-[#030303]"
+        className="bg-[#030303]"
       />
 
       {/* ── Fixed 3D viewport ───────────────────────────────────────────────
-          position:fixed creates its own isolated compositor layer — no sticky,
-          no overflow-hidden ancestor, no WebKit iOS black-screen bug.
-          Visibility toggled by RAF based on scroll position. */}
+          position:fixed creates its own compositor layer — no sticky, no
+          overflow-hidden stacking context → no WebKit iOS black-screen bug.
+          Invisible while spacer is off-screen (toggled by RAF). */}
       <div
         ref={viewportRef}
         style={{
@@ -206,9 +206,9 @@ const TechnologiesSection = ({ skills, sectionTitle }: TechnologiesSectionProps)
           </h2>
         </div>
 
-        {/* ── 3D world ──────────────────────────────────────────────────────
-            Fills the viewport so transform-origin 50% 50% is the screen centre.
-            RAF applies rotateX/rotateY for the camera tilt effect. */}
+        {/* ── 3D world ────────────────────────────────────────────────────────
+            Fills the full viewport so transform-origin 50% 50% = screen centre.
+            RAF applies rotateX/Y for camera tilt.                            */}
         <div
           ref={worldRef}
           style={{
@@ -229,37 +229,36 @@ const TechnologiesSection = ({ skills, sectionTitle }: TechnologiesSectionProps)
                 position:        "absolute",
                 top:             "50%",
                 left:            "50%",
-                width:           "380px",
+                // translate3d(-50%,-50%) in RAF handles centering — no margin needed
+                width:           "min(380px, 88vw)",
                 height:          "450px",
-                marginLeft:      "-190px",
-                marginTop:       "-225px",
                 opacity:         0,
-                transformStyle:  "preserve-3d",
+                display:         "none",
                 transformOrigin: "center center",
               }}
-              className="tech-card flex flex-col justify-between bg-[#0a0a0a]/80 backdrop-blur-md border border-white/10 p-10 group hover:border-[#E8175D]"
+              className="tech-card flex-col justify-between bg-[#0a0a0a]/40 backdrop-blur-md border border-white/10 p-8 md:p-10 group hover:border-[#E8175D]"
             >
               {/* Corner accent marks */}
-              <div className="absolute -top-px -left-px  w-4 h-4 border-t border-l border-white/30 group-hover:border-[#E8175D] transition-colors" />
+              <div className="absolute -top-px    -left-px  w-4 h-4 border-t border-l border-white/30 group-hover:border-[#E8175D] transition-colors" />
               <div className="absolute -bottom-px -right-px w-4 h-4 border-b border-r border-white/30 group-hover:border-[#E8175D] transition-colors" />
 
-              {/* Card header */}
-              <div className="border-b border-white/10 pb-4 flex justify-between items-center">
+              {/* Card header — ID badge + status indicator */}
+              <div className="card-header border-b border-white/10 pb-4 flex justify-between items-center">
                 <span className="font-mono text-[10px] text-[#E8175D] tracking-widest">
                   ID-{1000 + ((index * 1337 + 42) % 9000)}
                 </span>
                 <div className="w-2 h-2 bg-[#E8175D] shadow-[0_0_10px_#E8175D]" />
               </div>
 
-              {/* Skill name */}
+              {/* Skill name — centred, large display font */}
               <div className="flex-1 flex items-center justify-center">
                 <h3 className="font-display text-5xl md:text-6xl tracking-tighter uppercase leading-none text-center group-hover:text-[#E8175D] transition-colors mix-blend-hard-light">
                   {skill}
                 </h3>
               </div>
 
-              {/* Card footer */}
-              <div className="pt-4 border-t border-white/10 flex justify-between items-end">
+              {/* Card footer — fake metadata + index number */}
+              <div className="card-footer pt-4 border-t border-white/10 flex justify-between items-end">
                 <div className="font-mono text-[8px] text-gray-500 space-y-1">
                   <div>GRID: {(index * 3) % 10}x{(index * 7) % 10}</div>
                   <div>DATA_SIZE: {((index * 13.7) % 100).toFixed(1)}MB</div>
