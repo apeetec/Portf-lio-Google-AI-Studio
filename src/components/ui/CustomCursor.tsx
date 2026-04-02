@@ -11,18 +11,25 @@ import gsap from "gsap";
  *   attaching handlers to every interactive element.
  * - Returns null on touch/mobile devices: mix-blend-mode on a fixed element
  *   causes a black screen bug on iOS Safari and Chrome iOS.
+ *
+ * NOTE: All hooks are called unconditionally (Rules of Hooks). The touch
+ * check is stored in a ref SO that the conditional return comes after hooks.
  */
 const CustomCursor = () => {
-  // Touch devices have no cursor — skip rendering entirely.
-  // mix-blend-mode: difference on a fixed element causes black screen on mobile.
-  const isTouchDevice =
+  // Stored in a ref so it's computed once and never triggers a re-render.
+  const isMobile = useRef(
     typeof window !== "undefined" &&
-    ("ontouchstart" in window || navigator.maxTouchPoints > 0);
-  if (isTouchDevice) return null;
-  const cursorRef  = useRef<HTMLDivElement>(null);
+      ("ontouchstart" in window || navigator.maxTouchPoints > 0)
+  );
+
+  const cursorRef   = useRef<HTMLDivElement>(null);
   const [isHovering, setIsHovering] = useState(false);
 
   useEffect(() => {
+    // Do nothing on touch devices — no mouse, and mix-blend-mode causes
+    // a black screen bug on iOS WebKit.
+    if (isMobile.current) return;
+
     const cursor = cursorRef.current;
     if (!cursor) return;
 
@@ -60,6 +67,9 @@ const CustomCursor = () => {
       document.body.removeEventListener("mouseout",  onMouseOut);
     };
   }, []);
+
+  // Hooks are all called above — safe to conditionally return null here.
+  if (isMobile.current) return null;
 
   return (
     <div

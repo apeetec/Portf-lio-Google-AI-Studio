@@ -47,17 +47,31 @@ export function useScrollAnimations({
   useGSAP(
     () => {
       // ── 1. Lenis Smooth Scroll ─────────────────────────────────────────────
-      const lenis = new Lenis({
-        duration: 1.2,
-        easing:   (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      });
+      // Lenis overrides native scroll events. On iOS (all browsers use WebKit),
+      // this conflicts with the native momentum scroll and can leave GSAP
+      // animations stuck at their FROM state (opacity: 0), producing a black
+      // screen. Native iOS scroll is already smooth — Lenis adds nothing there.
+      const isTouchDevice =
+        "ontouchstart" in window || navigator.maxTouchPoints > 0;
 
-      // Keep ScrollTrigger in sync with Lenis scroll position
-      lenis.on("scroll", ScrollTrigger.update);
+      let lenis: Lenis | undefined;
 
-      // Drive Lenis from GSAP's ticker so they share the same clock
-      gsap.ticker.add((time) => { lenis.raf(time * 1000); });
-      gsap.ticker.lagSmoothing(0);
+      if (!isTouchDevice) {
+        lenis = new Lenis({
+          duration: 1.2,
+          easing:   (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        });
+
+        // Keep ScrollTrigger in sync with Lenis scroll position
+        lenis.on("scroll", ScrollTrigger.update);
+
+        // Drive Lenis from GSAP's ticker so they share the same clock
+        gsap.ticker.add((time) => { lenis!.raf(time * 1000); });
+        gsap.ticker.lagSmoothing(0);
+      } else {
+        // On touch devices, let ScrollTrigger listen to native scroll directly
+        ScrollTrigger.normalizeScroll(false);
+      }
 
       // ── 2. Experience Section — Mouse-Tracking Radial Light ────────────────
       const expLight = document.querySelector(".experience-light") as HTMLElement;
@@ -237,7 +251,7 @@ export function useScrollAnimations({
 
       // ── Cleanup ────────────────────────────────────────────────────────────
       return () => {
-        lenis.destroy();
+        lenis?.destroy();
         if (updateLight) window.removeEventListener("mousemove", updateLight);
       };
     },

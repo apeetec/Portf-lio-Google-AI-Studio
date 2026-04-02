@@ -8,6 +8,12 @@ export default defineConfig(({mode}) => {
   return {
     base: '/Portf-lio-Google-AI-Studio/',
     plugins: [react(), tailwindcss()],
+    build: {
+      // Target iOS 14 Safari / ES2020 to ensure broad mobile compatibility.
+      // This ensures no syntax (optional chaining, nullish coalescing, etc.)
+      // is left un-transpiled for older iOS WebKit versions.
+      target: ['es2020', 'safari14'],
+    },
     define: {
       'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY),
     },
