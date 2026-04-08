@@ -48,6 +48,8 @@ export interface ApiProject {
   title: string;
   excerpt: string;
   thumbnail: string;
+  /** External project URL from CMB2 `projeto_link` field. */
+  link?: string;
 }
 
 /** /wp-json/client/v1/experiencia — single item */

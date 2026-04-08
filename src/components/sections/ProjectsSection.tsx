@@ -2,12 +2,13 @@ import { ArrowUpRight } from "lucide-react";
 import SectionHeader from "../ui/SectionHeader";
 import type { ApiProject } from "../../types";
 
-const API_URL: string = import.meta.env.VITE_API_URL ?? "";
+const BASE_PATH: string = import.meta.env.BASE_URL ?? "/";
 
 interface ProjectsSectionProps {
   projects: ApiProject[];
   sectionTitle: string;
   verMaisLabel?: string;
+  verTodosLabel?: string;
 }
 
 /**
@@ -24,7 +25,7 @@ interface ProjectsSectionProps {
  * GSAP target: `.project-item` — batch scroll-reveal managed by
  * `useScrollAnimations`.
  */
-const ProjectsSection = ({ projects, sectionTitle, verMaisLabel = "VER MAIS" }: ProjectsSectionProps) => (
+const ProjectsSection = ({ projects, sectionTitle, verMaisLabel = "VER MAIS", verTodosLabel = "VER TODOS OS PROJETOS" }: ProjectsSectionProps) => (
   <section id="projects" className="relative z-10 py-32 px-8 md:px-12">
     <div className="max-w-7xl w-full mx-auto">
       <SectionHeader number="02" title={sectionTitle} />
@@ -70,18 +71,20 @@ const ProjectsSection = ({ projects, sectionTitle, verMaisLabel = "VER MAIS" }: 
                 </div>
               </div>
 
-              {/* Right side — "Ver mais" button */}
+              {/* Right side — external project link */}
               <div className="flex items-center gap-4 mt-6 md:mt-0 shrink-0">
-                <a
-                  href={`${API_URL}/?p=${project.id}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="font-mono text-[9px] tracking-widest border border-gray-700 px-4 py-2 text-gray-400 hover:border-[#E8175D] hover:text-white transition-colors uppercase flex items-center gap-2"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  {verMaisLabel}
-                  <ArrowUpRight size={12} />
-                </a>
+                {project.link ? (
+                  <a
+                    href={project.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-mono text-[9px] tracking-widest border border-gray-700 px-4 py-2 text-gray-400 hover:border-[#E8175D] hover:text-white transition-colors uppercase flex items-center gap-2"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {verMaisLabel}
+                    <ArrowUpRight size={12} />
+                  </a>
+                ) : null}
               </div>
 
               {/* Arrow icon — visible only on hover */}
@@ -90,6 +93,17 @@ const ProjectsSection = ({ projects, sectionTitle, verMaisLabel = "VER MAIS" }: 
               </div>
             </div>
           ))}
+
+          {/* View all projects link */}
+          <div className="flex justify-end pt-12">
+            <a
+              href={`${BASE_PATH}projects`}
+              className="group font-mono text-[10px] tracking-widest border border-gray-700 px-6 py-3 text-gray-400 hover:border-[#E8175D] hover:text-white transition-all duration-300 uppercase flex items-center gap-3"
+            >
+              {verTodosLabel}
+              <ArrowUpRight size={12} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-300" />
+            </a>
+          </div>
         </div>
       )}
     </div>

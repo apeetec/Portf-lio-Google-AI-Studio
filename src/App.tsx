@@ -279,7 +279,7 @@ export default function App() {
 
       {/* Page sections */}
       <HeroSection lang={lang} t={t} apiDescription={sobreMim.descricao} />
-      <ProjectsSection     projects={apiProjects}    sectionTitle={t[lang].sections.projects} verMaisLabel={lang === "pt" ? "VER MAIS" : "VIEW MORE"} />
+      <ProjectsSection     projects={apiProjects}    sectionTitle={t[lang].sections.projects} verMaisLabel={lang === "pt" ? "VER MAIS" : "VIEW MORE"} verTodosLabel={lang === "pt" ? "VER TODOS OS PROJETOS" : "VIEW ALL PROJECTS"} />
       <ExperienceSection   experiences={experiences} sectionTitle={t[lang].sections.experience} sectionRef={experienceRef} />
       <EducationSection    lang={lang} t={t} formacoes={apiFormacoes} />
       <TechnologiesSection skills={techStack} sectionTitle={t[lang].sections.technologies} />
