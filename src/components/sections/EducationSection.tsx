@@ -11,6 +11,7 @@ import {
   FileCode2,
 } from "lucide-react";
 import SectionHeader from "../ui/SectionHeader";
+import type { ApiFormacao } from "../../types";
 
 interface EducationTranslations {
   degree1: { title: string; period: string; inst: string; skills: string };
@@ -26,9 +27,31 @@ interface Translations {
 interface EducationSectionProps {
   lang: "pt" | "en";
   t: { pt: Translations; en: Translations };
+  /** When provided and non-empty, replaces the static degree content. */
+  formacoes?: ApiFormacao[];
 }
 
-const EducationSection = ({ lang, t }: EducationSectionProps) => {
+const EducationSection = ({ lang, t, formacoes }: EducationSectionProps) => {
+  const useApi = formacoes && formacoes.length > 0;
+
+  // Uniform structure for rendering — either from API or static translations
+  const degrees = useApi
+    ? formacoes!.map((f) => ({
+        title: f.curso,
+        period: f.ano,
+        inst: f.instituicao,
+        body: f.descricao_curso,
+        tag: "Description",
+      }))
+    : [
+        { title: t[lang].education.degree1.title, period: t[lang].education.degree1.period, inst: t[lang].education.degree1.inst, body: t[lang].education.degree1.skills, tag: "Skills" },
+        { title: t[lang].education.degree2.title, period: t[lang].education.degree2.period, inst: t[lang].education.degree2.inst, body: t[lang].education.degree2.skills, tag: "Skills" },
+        { title: t[lang].education.degree3.title, period: t[lang].education.degree3.period, inst: t[lang].education.degree3.inst, body: t[lang].education.degree3.desc,   tag: "Description" },
+      ];
+
+  // Count lines for the line-number gutter
+  const lineCount = 2 + degrees.length * 9 + 1;
+
   return (
     <section id="education" className="relative z-10 py-32 px-8 md:px-12">
       <div className="max-w-7xl w-full mx-auto relative z-10">
@@ -125,46 +148,28 @@ const EducationSection = ({ lang, t }: EducationSectionProps) => {
               <div className="flex-1 flex overflow-auto p-4 font-mono text-[13px] md:text-sm leading-[1.6]">
                 {/* Line Numbers */}
                 <div className="flex flex-col text-[#858585] text-right pr-6 select-none">
-                  {Array.from({ length: 28 }).map((_, i) => (
+                  {Array.from({ length: lineCount }).map((_, i) => (
                     <span key={i}>{i + 1}</span>
                   ))}
                 </div>
 
-                {/* Code Content */}
+                {/* Code Content — dynamic from API or static fallback */}
                 <div className="flex flex-col text-[#d4d4d4] whitespace-pre">
                   <div><span className="text-[#808080]">&lt;</span><span className="text-[#569cd6]">AcademicBackground</span><span className="text-[#808080]">&gt;</span></div>
 
-                  {/* Degree 1 */}
-                  <div className="ml-4"><span className="text-[#808080]">&lt;</span><span className="text-[#4ec9b0]">Degree</span></div>
-                  <div className="ml-8"><span className="text-[#9cdcfe]">title</span><span className="text-[#d4d4d4]">=</span><span className="text-[#ce9178]">"{t[lang].education.degree1.title}"</span></div>
-                  <div className="ml-8"><span className="text-[#9cdcfe]">period</span><span className="text-[#d4d4d4]">=</span><span className="text-[#ce9178]">"{t[lang].education.degree1.period}"</span></div>
-                  <div className="ml-8"><span className="text-[#9cdcfe]">institution</span><span className="text-[#d4d4d4]">=</span><span className="text-[#ce9178]">"{t[lang].education.degree1.inst}"</span><span className="text-[#808080]">&gt;</span></div>
-                  <div className="ml-8"><span className="text-[#808080]">&lt;</span><span className="text-[#4ec9b0]">Skills</span><span className="text-[#808080]">&gt;</span></div>
-                  <div className="ml-12 text-[#ce9178] whitespace-normal max-w-xl">{t[lang].education.degree1.skills}</div>
-                  <div className="ml-8"><span className="text-[#808080]">&lt;/</span><span className="text-[#4ec9b0]">Skills</span><span className="text-[#808080]">&gt;</span></div>
-                  <div className="ml-4"><span className="text-[#808080]">&lt;/</span><span className="text-[#4ec9b0]">Degree</span><span className="text-[#808080]">&gt;</span></div>
-                  <div></div>
-
-                  {/* Degree 2 */}
-                  <div className="ml-4"><span className="text-[#808080]">&lt;</span><span className="text-[#4ec9b0]">Degree</span></div>
-                  <div className="ml-8"><span className="text-[#9cdcfe]">title</span><span className="text-[#d4d4d4]">=</span><span className="text-[#ce9178]">"{t[lang].education.degree2.title}"</span></div>
-                  <div className="ml-8"><span className="text-[#9cdcfe]">period</span><span className="text-[#d4d4d4]">=</span><span className="text-[#ce9178]">"{t[lang].education.degree2.period}"</span></div>
-                  <div className="ml-8"><span className="text-[#9cdcfe]">institution</span><span className="text-[#d4d4d4]">=</span><span className="text-[#ce9178]">"{t[lang].education.degree2.inst}"</span><span className="text-[#808080]">&gt;</span></div>
-                  <div className="ml-8"><span className="text-[#808080]">&lt;</span><span className="text-[#4ec9b0]">Skills</span><span className="text-[#808080]">&gt;</span></div>
-                  <div className="ml-12 text-[#ce9178] whitespace-normal max-w-xl">{t[lang].education.degree2.skills}</div>
-                  <div className="ml-8"><span className="text-[#808080]">&lt;/</span><span className="text-[#4ec9b0]">Skills</span><span className="text-[#808080]">&gt;</span></div>
-                  <div className="ml-4"><span className="text-[#808080]">&lt;/</span><span className="text-[#4ec9b0]">Degree</span><span className="text-[#808080]">&gt;</span></div>
-                  <div></div>
-
-                  {/* Degree 3 */}
-                  <div className="ml-4"><span className="text-[#808080]">&lt;</span><span className="text-[#4ec9b0]">Degree</span></div>
-                  <div className="ml-8"><span className="text-[#9cdcfe]">title</span><span className="text-[#d4d4d4]">=</span><span className="text-[#ce9178]">"{t[lang].education.degree3.title}"</span></div>
-                  <div className="ml-8"><span className="text-[#9cdcfe]">period</span><span className="text-[#d4d4d4]">=</span><span className="text-[#ce9178]">"{t[lang].education.degree3.period}"</span></div>
-                  <div className="ml-8"><span className="text-[#9cdcfe]">institution</span><span className="text-[#d4d4d4]">=</span><span className="text-[#ce9178]">"{t[lang].education.degree3.inst}"</span><span className="text-[#808080]">&gt;</span></div>
-                  <div className="ml-8"><span className="text-[#808080]">&lt;</span><span className="text-[#4ec9b0]">Description</span><span className="text-[#808080]">&gt;</span></div>
-                  <div className="ml-12 text-[#ce9178] whitespace-normal max-w-2xl">{t[lang].education.degree3.desc}</div>
-                  <div className="ml-8"><span className="text-[#808080]">&lt;/</span><span className="text-[#4ec9b0]">Description</span><span className="text-[#808080]">&gt;</span></div>
-                  <div className="ml-4"><span className="text-[#808080]">&lt;/</span><span className="text-[#4ec9b0]">Degree</span><span className="text-[#808080]">&gt;</span></div>
+                  {degrees.map((deg, idx) => (
+                    <div key={idx}>
+                      <div className="ml-4"><span className="text-[#808080]">&lt;</span><span className="text-[#4ec9b0]">Degree</span></div>
+                      <div className="ml-8"><span className="text-[#9cdcfe]">title</span><span className="text-[#d4d4d4]">=</span><span className="text-[#ce9178]">"{deg.title}"</span></div>
+                      <div className="ml-8"><span className="text-[#9cdcfe]">period</span><span className="text-[#d4d4d4]">=</span><span className="text-[#ce9178]">"{deg.period}"</span></div>
+                      <div className="ml-8"><span className="text-[#9cdcfe]">institution</span><span className="text-[#d4d4d4]">=</span><span className="text-[#ce9178]">"{deg.inst}"</span><span className="text-[#808080]">&gt;</span></div>
+                      <div className="ml-8"><span className="text-[#808080]">&lt;</span><span className="text-[#4ec9b0]">{deg.tag}</span><span className="text-[#808080]">&gt;</span></div>
+                      <div className="ml-12 text-[#ce9178] whitespace-normal max-w-xl" dangerouslySetInnerHTML={{ __html: deg.body }} />
+                      <div className="ml-8"><span className="text-[#808080]">&lt;/</span><span className="text-[#4ec9b0]">{deg.tag}</span><span className="text-[#808080]">&gt;</span></div>
+                      <div className="ml-4"><span className="text-[#808080]">&lt;/</span><span className="text-[#4ec9b0]">Degree</span><span className="text-[#808080]">&gt;</span></div>
+                      {idx < degrees.length - 1 && <div />}
+                    </div>
+                  ))}
 
                   <div><span className="text-[#808080]">&lt;/</span><span className="text-[#569cd6]">AcademicBackground</span><span className="text-[#808080]">&gt;</span></div>
                 </div>

@@ -8,10 +8,11 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 // ── Data ──────────────────────────────────────────────────────────────────────
-import { PROJECTS, SKILLS } from "./data/portfolio";
+import { SKILLS } from "./data/portfolio";
 
 // ── Hooks ─────────────────────────────────────────────────────────────────────
 import { useScrollAnimations } from "./hooks/useScrollAnimations";
+import { usePortfolioData }    from "./hooks/usePortfolioData";
 
 // ── UI Components ─────────────────────────────────────────────────────────────
 import CustomCursor from "./components/ui/CustomCursor";
@@ -177,8 +178,18 @@ export default function App() {
     { id: "06", label: t[lang].nav.contact,      href: "#contact"    },
   ];
 
-  // ── Bilingual experience data ─────────────────────────────────────────────
-  const experiences = lang === "pt" ? [
+  // ── API data from WordPress REST routes ──────────────────────────────────
+  const { sobreMim, apiProjects, apiExperiences, apiFormacoes, apiTechStack } = usePortfolioData();
+
+  // Map API experiences → internal Experience type; fall back to static when empty
+  const experiences = apiExperiences.length > 0
+    ? apiExperiences.map((e) => ({
+        role: e.cargo,
+        company: e.empresa,
+        year: e.ano,
+        description: e.descricao_cargo,
+      }))
+    : (lang === "pt" ? [
     {
       role: "WEB DEVELOPER FULLSTACK",
       company: "HOSPITAL MATERNIDADE DE CAMPINAS",
@@ -240,7 +251,10 @@ export default function App() {
       year: "2019 – 2021",
       description: "ERP maintenance in Visual Basic/SQL. Developed new institutional website and provided infrastructure support.",
     },
-  ];
+  ]);
+
+  // Tech stack: use API data when available, else static fallback
+  const techStack = apiTechStack.length > 0 ? apiTechStack : SKILLS;
 
   // ── All GSAP / Lenis animation logic ────────────────────────────────────
   useScrollAnimations({
@@ -256,7 +270,7 @@ export default function App() {
     >
       {/* Global UI overlays */}
       <CustomCursor />
-      <SocialBar />
+      <SocialBar links={{ github: sobreMim.github_link, linkedin: sobreMim.linkedin_link, twitter: sobreMim.twitter_link, email: sobreMim.email }} />
       <div className="wavy-overlay fixed inset-0 z-0 pointer-events-none" />
       <div className="noise-overlay" />
 
@@ -264,12 +278,12 @@ export default function App() {
       <Navbar items={navItems} activeSection={activeSection} lang={lang} setLang={setLang} />
 
       {/* Page sections */}
-      <HeroSection lang={lang} t={t} />
-      <ProjectsSection     projects={PROJECTS}    sectionTitle={t[lang].sections.projects} />
+      <HeroSection lang={lang} t={t} apiDescription={sobreMim.descricao} />
+      <ProjectsSection     projects={apiProjects}    sectionTitle={t[lang].sections.projects} verMaisLabel={lang === "pt" ? "VER MAIS" : "VIEW MORE"} />
       <ExperienceSection   experiences={experiences} sectionTitle={t[lang].sections.experience} sectionRef={experienceRef} />
-      <EducationSection    lang={lang} t={t} />
-      <TechnologiesSection skills={SKILLS} sectionTitle={t[lang].sections.technologies} />
-      <ContactSection      lang={lang} t={t} />
+      <EducationSection    lang={lang} t={t} formacoes={apiFormacoes} />
+      <TechnologiesSection skills={techStack} sectionTitle={t[lang].sections.technologies} />
+      <ContactSection      lang={lang} t={t} apiEmail={sobreMim.email} />
       <Footer />
     </div>
   );

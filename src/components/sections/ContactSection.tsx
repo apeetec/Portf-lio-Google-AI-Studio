@@ -16,9 +16,12 @@ interface ContactT {
 interface ContactSectionProps {
   lang: "pt" | "en";
   t: { pt: ContactT; en: ContactT };
+  apiEmail?: string;
 }
 
-const ContactSection = ({ lang, t }: ContactSectionProps) => (
+const ContactSection = ({ lang, t, apiEmail }: ContactSectionProps) => {
+  const email = apiEmail ?? "gabriel938@gmail.com";
+  return (
   <section id="contact" className="relative z-10 py-32 px-8 md:px-12">
     <div className="max-w-7xl w-full mx-auto">
       <SectionHeader number="06" title={t[lang].sections.contact} />
@@ -34,10 +37,10 @@ const ContactSection = ({ lang, t }: ContactSectionProps) => (
 
           <div className="flex flex-col gap-4">
             <a
-              href="mailto:gabriel938@gmail.com"
+              href={`mailto:${email}`}
               className="font-mono text-xl md:text-2xl hover:text-[#E8175D] transition-colors underline underline-offset-8 decoration-gray-800 hover:decoration-[#E8175D]"
             >
-              gabriel938@gmail.com
+              {email}
             </a>
             <p className="font-mono text-xs text-gray-500 uppercase tracking-widest">
               {t[lang].contact.status}
@@ -52,6 +55,7 @@ const ContactSection = ({ lang, t }: ContactSectionProps) => (
       </div>
     </div>
   </section>
-);
+  );
+};
 
 export default ContactSection;

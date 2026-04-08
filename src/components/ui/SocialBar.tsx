@@ -1,25 +1,29 @@
 import { Github, Linkedin, Mail, Twitter } from "lucide-react";
 
-/**
- * Fixed vertical social links bar, anchored to the bottom-left of the viewport.
- * Only visible on large screens (lg breakpoint).
- *
- * The `.social-icons` class is targeted by the GSAP entrance animation
- * registered in `useScrollAnimations`.
- */
-const SocialBar = () => (
+interface SocialLinks {
+  github?: string;
+  linkedin?: string;
+  twitter?: string;
+  email?: string;
+}
+
+interface SocialBarProps {
+  links?: SocialLinks;
+}
+
+const SocialBar = ({ links }: SocialBarProps) => (
   <div className="fixed left-6 bottom-0 z-50 hidden lg:flex flex-col items-center gap-6 pb-12">
     <div className="social-icons flex flex-col gap-6">
-      <a href="#" className="text-gray-500 hover:text-[#E8175D] transition-colors">
+      <a href={links?.github ?? "#"} target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-[#E8175D] transition-colors">
         <Github size={18} />
       </a>
-      <a href="#" className="text-gray-500 hover:text-[#E8175D] transition-colors">
+      <a href={links?.linkedin ?? "#"} target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-[#E8175D] transition-colors">
         <Linkedin size={18} />
       </a>
-      <a href="#" className="text-gray-500 hover:text-[#E8175D] transition-colors">
+      <a href={links?.twitter ?? "#"} target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-[#E8175D] transition-colors">
         <Twitter size={18} />
       </a>
-      <a href="#" className="text-gray-500 hover:text-[#E8175D] transition-colors">
+      <a href={links?.email ? `mailto:${links.email}` : "#"} className="text-gray-500 hover:text-[#E8175D] transition-colors">
         <Mail size={18} />
       </a>
     </div>

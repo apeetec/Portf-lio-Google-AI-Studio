@@ -15,9 +15,11 @@ interface HeroT {
 interface HeroSectionProps {
   lang: "pt" | "en";
   t: { pt: HeroT; en: HeroT };
+  /** When provided, overrides the static description from translations. */
+  apiDescription?: string;
 }
 
-const HeroSection = ({ lang, t }: HeroSectionProps) => (
+const HeroSection = ({ lang, t, apiDescription }: HeroSectionProps) => (
   <section
     id="home"
     className="relative z-10 flex flex-col justify-center min-h-screen px-8 md:px-12 pt-20"
@@ -72,7 +74,7 @@ const HeroSection = ({ lang, t }: HeroSectionProps) => (
         {/* Right: bio */}
         <div className="flex flex-col items-end text-right">
           <p className="max-w-md font-mono text-[11px] leading-relaxed text-gray-500 uppercase tracking-tight">
-            {t[lang].hero.description}
+            {apiDescription ?? t[lang].hero.description}
           </p>
         </div>
       </div>

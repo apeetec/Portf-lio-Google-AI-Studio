@@ -30,3 +30,38 @@ export interface Experience {
   year: string;
   description: string;
 }
+
+// ── API response types (WordPress REST API) ───────────────────────────────────
+
+/** /wp-json/client/v1/sobre-mim */
+export interface SobreMim {
+  descricao?: string;
+  github_link?: string;
+  linkedin_link?: string;
+  twitter_link?: string;
+  email?: string;
+}
+
+/** /wp-json/client/v1/projetos */
+export interface ApiProject {
+  id: number;
+  title: string;
+  excerpt: string;
+  thumbnail: string;
+}
+
+/** /wp-json/client/v1/experiencia — single item */
+export interface ApiExperience {
+  cargo: string;
+  empresa: string;
+  ano: string;
+  descricao_cargo: string;
+}
+
+/** /wp-json/client/v1/formacao — single item */
+export interface ApiFormacao {
+  curso: string;
+  instituicao: string;
+  ano: string;
+  descricao_curso: string;
+}
