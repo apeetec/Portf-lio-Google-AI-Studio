@@ -83,8 +83,10 @@ export default function App() {
           email: "E-mail",
           message: "Mensagem",
           send: "Enviar",
+          sending: "Enviando...",
           thanks: "OBRIGADO",
           success: "Sua mensagem foi recebida. Entrarei em contato em breve.",
+          error: "Erro ao enviar. Verifique sua conexão e tente novamente.",
         },
       },
       education: {
@@ -141,8 +143,10 @@ export default function App() {
           email: "Email",
           message: "Message",
           send: "Send",
+          sending: "Sending...",
           thanks: "THANK YOU",
           success: "Your message has been received. I'll get back to you soon.",
+          error: "Failed to send. Check your connection and try again.",
         },
       },
       education: {
